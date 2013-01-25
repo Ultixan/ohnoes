@@ -12,8 +12,14 @@ class game_list(webapp.RequestHandler):
     path = template_path('index.html')
 
     def get(self):
+        grid = []
+        row = []
+        for j in range(0, 10):
+            row.append('')
+        for i in range(0, 10):
+            grid.append(row)
         self.response.out.write(
-            template.render(self.path, {})
+            template.render(self.path, {'grid': grid})
         )
 
 urls = [

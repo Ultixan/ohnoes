@@ -2,8 +2,17 @@
   <head>
     <title>Oh Noes!</title>
     <script src="scripts/jq.js" type="javascript"></script>
+    <link rel="stylesheet" href="styles/game.css"/>
   </head>
   <body>
-    Woo!
+    <table class="grid">
+    {% for row in grid %}
+      <tr>
+      {% for cell in row %}
+        <td>{{cell}}</td>
+      {% endfor %}
+      </tr>
+    {% endfor %}
+    </table>
   </body>
 </html>

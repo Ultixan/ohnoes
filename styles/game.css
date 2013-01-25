@@ -1,0 +1,17 @@
+table.grid {
+  border: none;
+  padding: 0;
+  border-collapse: collapse;
+  margin: 0 auto;
+}
+
+table.grid td {
+  height: 64px;
+  width: 64px;
+  background: #DEDEDE;
+}
+
+table.grid tr:nth-child(odd) td:nth-child(even), 
+table.grid tr:nth-child(even) td:nth-child(odd) {
+  background: #C7C7C7;
+}
