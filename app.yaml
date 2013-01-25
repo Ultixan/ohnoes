@@ -1,0 +1,17 @@
+application: ohnoes
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: no
+
+handlers:
+- url: /styles
+  static_dir: styles
+- url: /images
+  static_dir: images
+- url: /scripts
+  static_dir: scripts
+- url: /sounds
+  static_dir: sounds
+- url: /.*
+  script: code.py
