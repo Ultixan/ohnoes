@@ -8,7 +8,7 @@ from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 from util import template_path
 
-class game_list(webapp.RequestHandler):
+class display_game(webapp.RequestHandler):
     path = template_path('index.html')
 
     def get(self):
@@ -23,7 +23,7 @@ class game_list(webapp.RequestHandler):
         )
 
 urls = [
-  ('/', game_list)
+  ('/', display_game)
   ]
 
 app = webapp.WSGIApplication(urls, debug=True)
