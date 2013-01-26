@@ -2,6 +2,7 @@ import cgi
 import json
 
 from constants import directions
+from constants import column_range
 from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
@@ -31,7 +32,8 @@ class display_game(webapp.RequestHandler):
             tiles.append(newRow)
         self.response.out.write(
             template.render(self.path, {
-                'tiles': tiles
+                'tiles': tiles,
+                'columns': column_range
             })
         )
 

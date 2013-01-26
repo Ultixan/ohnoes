@@ -6,13 +6,25 @@
   </head>
   <body>
     <table class="grid">
+      <tr>
+      {% for i in columns %}
+        <td class="shifter top"></td>
+      {% endfor %}
+      </tr>
     {% for row in tiles %}
       <tr>
+        <td class="shifter left"></td>
       {% for cell in row %}
         <td class="tile {{cell}}"></td>
       {% endfor %}
+        <td class="shifter right"></td>
       </tr>
     {% endfor %}
+      <tr>
+      {% for i in columns %}
+        <td class="shifter bottom"></td>
+      {% endfor %}
+      </tr>
     </table>
     <ul id="actions">
       <li id="rotate_left">Rotate Left</li>
@@ -20,6 +32,13 @@
       <li id="swap_tiles">Swap Tiles</li>
       <li id="shift_tiles">Shift Tiles</li>
     </ul>
+    <div id="heart_monitor">
+      <div id="beats">
+        <div id="bar"></div>
+      </div>
+      <div id="heart"></div>
+      <div id="rate"></div>
+    </div>
     <script src="scripts/jq.js" type="text/javascript"></script>
     <script src="scripts/game.js" type="text/javascript"></script>
   </body>
