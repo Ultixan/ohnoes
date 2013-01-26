@@ -3,6 +3,14 @@ var action = null;
 var shifters = $('table.grid td.shifter');
 var target = $('<div id="target"/>');
 var tiles = $('table.grid td.tile');
+var pokedex = {};
+var heart = 1;
+var hearts = [
+    'tiny',
+    'small',
+    'medium',
+    'large'
+];
 
 var getTileElement = function(x, y) {
     var row = $('table.grid tr:nth-child(' + (y + 2) + ')');
@@ -64,12 +72,27 @@ var updatePlayer = function(pdata) {
     }
 };
 
+var updateMonsters = function(monsters) {
+    $.each(pokedex, function(monster, element) {
+        element.detach();
+    });
+    $.each(monsters, function(monster, position) {
+        if (!pokedex.hasOwnProperty(monster)) {
+            pokedex[monster] = $('<span class="monster ' + monster + '"/>');
+        }
+        getTileElement(position.x, position.y).append(pokedex[monster]);
+    });
+};
+
 var handleUpdate = function(rsp) {
     if (rsp.hasOwnProperty('world')) {
         updateTiles(rsp.world);
     }
     if (rsp.hasOwnProperty('player')) {
         updatePlayer(rsp.player);
+    }
+    if (rsp.hasOwnProperty('monsters')) {
+        updateMonsters(rsp.monsters);
     }
 };
 
@@ -83,7 +106,7 @@ var performAction = function(params) {
 
 var audio = $('audio');
 var playBeat = function() {
-    audio[0].load();
+//    audio[0].load();
 //    audio[0].play();
 };
 var beat2 = function() {
@@ -92,9 +115,19 @@ var beat2 = function() {
 };
 var beat1 = function() {
     playBeat();
+    heart += 1;
+    $('#heart').removeClass('tiny small medium large').addClass(hearts[heart]);
     setTimeout(beat2, 200);
 };
 var manageBeat = function() {
+    if (player.heartrate > 149) {
+        heart = 2;
+    } else if (player.heartrate > 99) {
+        heart = 1;
+    } else {
+        heart = 0;
+    }
+    $('#heart').removeClass('tiny small medium large').addClass(hearts[heart]);
     var time = 60000 / (player.heartrate / 2) - 200;
     time = time < 400 ? 400 : time;
     setTimeout(beat1, time);

@@ -12,7 +12,7 @@ elements = {
 	'orb'	: 'dark',
 	'boogey': 'dark',
 	'stove'	: 'fire',
-	'match' : 'fire',
+	'lighter' : 'fire',
 	'flame' : 'fire',
 	'jelly' : 'water',
 	'shark' : 'water',

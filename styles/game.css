@@ -112,7 +112,22 @@ table.grid td.tile.current {
 #heart {
   width: 64px;
   height: 64px;
-  background-image: url('/images/heart.png');
+}
+
+#heart.tiny {
+  background-image: url('/images/heart1.png');
+}
+
+#heart.small {
+  background-image: url('/images/heart2.png');
+}
+
+#heart.medium {
+  background-image: url('/images/heart3.png');
+}
+
+#heart.large {
+  background-image: url('/images/heart4.png');
 }
 
 #player {
@@ -137,4 +152,27 @@ table.grid td.tile.current {
 
 #target.rotate_right {
   cursor: url('/images/rotate_right_sm.png'), pointer;
+}
+
+span.monster {
+  margin: auto auto;
+  height: 50px;
+  width: 50px;
+  display: inline-block;
+}
+
+span.flame {
+  background-image: url('/images/Flame.png');
+}
+
+span.ghost {
+  background-image: url('/images/ghost.png');
+}
+
+span.boogey {
+  background-image: url('/images/boogeman.png');
+}
+
+span.stove {
+  background-image: url('/images/stove.png');
 }

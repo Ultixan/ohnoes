@@ -172,8 +172,8 @@ def swap_tiles(world, monsters, player, params):
 
 def gen_rand_coords():
     # gen random coords
-    x = randint(0, 99)
-    y = randint(0, 99)
+    x = randint(0, 9)
+    y = randint(0, 9)
     return {'x':x, 'y':y}
 
 def spawn_monster(monsters, active_monsters, player, m_grid):
@@ -262,13 +262,16 @@ class action(webapp.RequestHandler):
                 
         # establish monster positions
         m_grid = []
-        for i in range(0,9):
+        for i in range(10):
             row = []
-            for j in range(0,9):
+            for j in range(10):
                 row.append(None)
             m_grid.append(row)
         for a in active_monsters:
             m = monsters[a]
+            logging.info('Position')
+            logging.info(m['y'])
+            logging.info(m['x'])
             m_grid[m['y']][m['x']] = m  
         # move monsters 
         monster_changes = move_monsters(world, monsters, player, m_grid, active_monsters)
@@ -290,7 +293,8 @@ class action(webapp.RequestHandler):
         # save the changed world
         game.tiles = json.dumps(world)
         # save the new monster positions
-        #game.monsters = json.dumps(monsters)
+        game.monsters = json.dumps(monsters)
+        game.active_monsters = json.dumps(active_monsters)
         # save the new powerup positions
         #game.powerups = json.dumps(powerups)
         # save the updated health
@@ -301,6 +305,10 @@ class action(webapp.RequestHandler):
         game.put()
 
         changes['player'] = player
+        monster_details = {}
+        for monster in active_monsters:
+            monster_details[monster] = monsters[monster]
+        changes['monsters'] = monster_details
         
         # response: send changes!
         self.response.headers['Content-Type'] = "application/json"
