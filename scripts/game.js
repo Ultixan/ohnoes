@@ -42,6 +42,26 @@ var updatePlayer = function(pdata) {
     );
 
     //Update heartrate
+
+    //Update active tiles
+    tiles.removeClass('active current');
+    var curTile = tile;
+    var x = player.x;
+    var y = player.y;
+    curTile.addClass('current');
+    for (var i=0; i < 3; i++) {
+        if (curTile.hasClass('up')) {
+            y = (y - 1) % 10;
+        } else if (curTile.hasClass('right')) {
+            x = (x + 1) % 10;
+        } else if (curTile.hasClass('down')) {
+            y = (y + 1) % 10;
+        } else {
+            x = (x - 1) % 10;
+        }
+        curTile = getTileElement(x, y);
+        curTile.addClass('active');
+    }
 };
 
 var handleUpdate = function(rsp) {
