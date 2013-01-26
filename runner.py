@@ -38,25 +38,6 @@ class display_game(webapp.RequestHandler):
         )
 
 class action(webapp.RequestHandler):
-	actions = {
-		"rotate_right" : rotate_right,
-		"rotate_left" : rotate_left
-	}
-	
-	def post(self):
-		# authenticate user
-		user = authorize(self)
-		# get world state (from user)
-		world_json = get_game(get_account(user).game_id).tiles
-		
-		#get action params from POST
-		params_json = self.request.body;
-		# get action key
-		action_key = json.loads(params_json)["action"]
-		# perform action on the world
-		changed_tiles = actions[action_key](world_json, params_json)
-		self.response.out.write(json.dumps({"tiles":changed_tiles}))
-	
 	# takes world json and tile coords, transforms, returns new version
 	def rotate_left(self, world_json, params_json):
 		world = json.loads(world_json)
@@ -78,6 +59,26 @@ class action(webapp.RequestHandler):
 		world[params[y]][params[x]] %= 4 # to wrap direction around to 0
 		
 		return world.dumps(json)
+
+	actions = {
+		'rotate_right': rotate_right,
+		'rotate_left': rotate_left
+	}
+	
+	def post(self):
+		# authenticate user
+		user = authorize(self)
+		# get world state (from user)
+		world_json = get_game(get_account(user).game_id).tiles
+		
+		#get action params from POST
+		params_json = self.request.body;
+		# get action key
+		action_key = json.loads(params_json)["action"]
+		# perform action on the world
+		changed_tiles = actions[action_key](world_json, params_json)
+		self.response.out.write(json.dumps({"tiles":changed_tiles}))
+	
 
 urls = [
   ('/', display_game)
