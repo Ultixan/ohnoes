@@ -22,7 +22,7 @@ def get_account(user):
         account = Account()
         account.user = user
         import uuid
-        account.game_id=uuid.uuid4()
+        account.game_id=uuid.uuid4().hex
         account.put()
         return account
     else:
