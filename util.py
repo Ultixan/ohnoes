@@ -33,27 +33,29 @@ def get_game(game_id):
         'WHERE game_id = :1',
         game_id)
     if game.count() < 1:
-        game = [Game()]
+        game = Game()
+        import uuid
         grid = []
         for i in range(0, 10):
             row = []
             for j in range(0, 10):
                 row.append(randint(0,3))
             grid.append(row)
-        game[0].tiles = json.dumps(grid)
-        #player
-        player = {}
-        player['heartrate']=50
-        player['heartbeats']=1000
-        player['x']=5
-        player['y']=5
-        player['abilities']={
-        'rotate_right':0,
-        'rotate_left':0,
-        'shift_tiles':0,
-        'swap_tiles':0
+        game.tiles = json.dumps(grid)
+        player = {
+            'heartrate': 60,
+            'heartbeats': 1000,
+            'x': 5,
+            'y': 5,
+            'objects': []
         }
-        game[0].player = json.dumps(player)
-        game[0].game_id = game_id
-        game[0].put()
-    return game[0]
+        monsters = []
+        powerups = []
+        game.player = json.dumps(player)
+        game.monsters = json.dumps(monsters)
+        game.powerups = json.dumps(powerups)
+        game.game_id = game_id
+        game.put()
+    else:
+        game = game[0]
+    return game

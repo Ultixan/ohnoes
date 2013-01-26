@@ -39,11 +39,11 @@ td.tile.right {
 }
 
 td.tile.down {
-  background-position: 0 64px;
+  background-position: 0 192px;
 }
 
 td.tile.left {
-  background-position: 0 192px;
+  background-position: 0 64px;
 }
 
 table.grid td.tile.active {

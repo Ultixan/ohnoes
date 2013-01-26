@@ -65,9 +65,10 @@ var updatePlayer = function(player) {
     //Update heartrate
 };
 
-var handleUpdate = function(req, rsp) {
-    console.log(req);
-    console.log(rsp);
+var handleUpdate = function(rsp) {
+    if (rsp.hasOwnProperty('world')) {
+        updateTiles(rsp.world);
+    }
 };
 
 var performAction = function(params) {

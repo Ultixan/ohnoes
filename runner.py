@@ -24,7 +24,6 @@ class display_game(webapp.RequestHandler):
         if not user:
             self.redirect(users.create_login_url(self.request.uri))
             return
-        logging.info(user)
         account = get_account(user)
         game = get_game(account.game_id)
         tiles = []
@@ -40,31 +39,40 @@ class display_game(webapp.RequestHandler):
             })
         )
 
-class action(webapp.RequestHandler):
-    # takes world json and tile coords, transforms, returns new version
-    def rotate_left(self, world, monsters, player, params_json):
-        params = json.loads(params_json)
-        
-        # tiles[row][column] -- world[y][x]
-        world[params[y]][params[x]] -= 1
-        world[params[y]][params[x]] %= 4 # to wrap direction around to 0
-        
-        player['abilities']['rotate_left'] = 2
-        
-        return {'change_type':'world', change:{'x':params[x], 'y':params[y], 'direction':world[params[y]][params[x]]}}
+def rotate(world, mosters, player, params, tick):
+    x = params['x']
+    y = params['y']
+    direction = (world[y][x] + tick) % 4
     
-    # takes world json and tile coords, transforms, returns new version
-    def rotate_right(self, world, monsters, player, params_json):
-        params = json.loads(params_json)
-        
-        # tiles[row][column] -- world[y][x]
-        world[params[y]][params[x]] += 1
-        world[params[y]][params[x]] %= 4 # to wrap direction around to 0
-        
-        player['abilities']['rotate_left'] = 2
-        
-        return [{'change_type':'world', 'change':{'x':params[x], 'y':params[y], 'direction':world[params[y]][params[x]]}}]
+    return {
+        'world': [{
+            'x': x,
+            'y': y,
+            'direction': direction
+        }]
+        }
+def rotate_left(world, monsters, player, params):
+    return rotate(world, monsters, player, params, -1)
+def rotate_right(world, monsters, player, params):
+    return rotate(world, monsters, player, params, 1)
 
+actions = {
+    'rotate_right': rotate_right,
+    'rotate_left': rotate_left
+}
+
+class action(webapp.RequestHandler):
+	def move_pos(self, move_code, coords):	
+		if move_code == 0:
+			coords['y'] = (coords['y']-1)%10
+		elif move_code == 1:
+			coords['x'] = (coords['x']+1)%10
+		elif move_code == 2:
+			coords['y'] = (coords['y']+1)%10
+		elif move_code == 3:
+			coords['x'] = (coords['x']-1)%10
+		return coords;
+        
     def shift_tiles(self, world, monsters, player, params):
         #Get the direction. If it's left or right, x++ for all x in world[params[y]]
         #If it's top or bottom, y++ for all y in world[params[x]]
@@ -113,25 +121,6 @@ class action(webapp.RequestHandler):
         
         return changes
 
-
-    actions = {
-        'rotate_right': rotate_right,
-        'rotate_left': rotate_left,
-        'shift_tiles':shift_tiles,
-        'swap_tiles':swap_tiles
-    }
-
-    def move_pos(self, move_code, coords):  
-        if move_code == 0:
-            coords['y'] = (coords['y']-1)%10
-        elif move_code == 1:
-            coords['x'] = (coords['x']+1)%10
-        elif move_code == 2:
-            coords['y'] = (coords['y']+1)%10
-        elif move_code == 3:
-            coords['x'] = (coords['x']-1)%10
-        return coords;
-        
     def move_player(self, world, player):
         # check direction of tile
         move_code = world[player['y']][player['x']]
@@ -204,32 +193,26 @@ class action(webapp.RequestHandler):
         
         # THEN perform new action && make it invalid
         # get action params from POST
-        params_json = self.request.body;
-
-        logging.info("JSON = " + str(json.loads('{"action":"x"}')))
+        params = json.loads(self.request.body)
         # get action key
-        action_key = json.loads(params_json)['action']
-       
-        logging.info("Action key = " + action_key)
-
+        action_key = params['action']
+        
         # calculate action on the world
-        changes = self.actions[action_key](world, monsters, player, json.loads(params_json))
+        changes = actions[action_key](world, monsters, player, params)
         
         # loop through changes and apply
-        for c in changes:
-            if c['change_type'] == 'world':
-                x = c['change']['x']
-                y = c['change']['y']
-                direction = c['change']['direction']
-                world[y][x] = direction
-            elif c['change_type'] == 'monsters':
+        for change in changes.keys():
+            if change == 'world':
+                for tile in changes[change]:
+                    world[tile['y']][tile['x']] = tile['direction']
+                    tile['direction'] = directions[tile['direction']]
+            elif change == 'monsters':
                 continue #@TODO
-            elif c['change_type'] == 'player':
+            elif change == 'player':
                 continue #@TODO
         
-        # move player
-        player = move_player(world, player)
-        # check for powerups
+        # move player & pick up any powerups
+        player = move_player(world, player, powerups)
         new_powerups = []
         for p in powerups:
             if (p['x'] == player['x'] and p['y'] == player['y']): # if there is a powerup on the square
@@ -237,22 +220,29 @@ class action(webapp.RequestHandler):
             else:
                 new_powerups.append(p)
         powerups = new_powerups
-                
-        # establish monster positions
-        m_grid = []
-        for m in monsters:
-            m_grid[m['y']][m['x']] = m  
-        # move monsters 
-        monster_changes = move_monsters(world, monsters, player)
-        monsters = monster_changes['monsters']
-        m_grid = monster_changes['m_grid']
-        #calculate damage
-        player = calc_damage(player, monster_changes['prox_count'])
+				
+		# establish monster positions
+		m_grid = []
+		for m in monsters:
+			m_grid[m['y']][m['x']] = m	
+		# move monsters	
+		monster_changes = move_monsters(world, monsters, player)
+		monsters = monster_changes['monsters']
+		m_grid = monster_changes['m_grid']
+		#calculate damage
+		player = calc_damage(player, monster_changes['prox_count'])
+		
+		# board updates!
+		# tile randomising (non-vital)
+		# monster spawning
+		# powerup drops        
+        # move monsters & calculate damage
+        # loop through monsters, check for proximity to player
         
         # board updates!
         # tile randomising (non-vital)
         # monster spawning
-        # powerup drops        
+        # powerup drops
         
         # save the changed world
         game.tiles = json.dumps(world)
@@ -266,11 +256,8 @@ class action(webapp.RequestHandler):
         game.put()
         
         # response: send changes!
+        self.response.headers['Content-Type'] = "application/json"
         self.response.out.write(json.dumps(changes))
-
-    def get(self):
-        self.request.body=str(self.request.get('post'))
-        self.post()
 
 urls = [
     ('/', display_game),
