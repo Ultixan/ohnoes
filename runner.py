@@ -35,7 +35,7 @@ class display_game(webapp.RequestHandler):
             })
         )
 
-class action():
+class action(webapp.RequestHandler):
 	actions = {
 		"rotate_right" : rotate_right,
 		"rotate_left" : rotate_left
@@ -52,16 +52,30 @@ class action():
 		# get action key
 		action_key = json.loads(params_json)["action"]
 		# perform action on the world
-		new_world_json = actions[action_key](world_json, params_json)	
+		changed_tiles = actions[action_key](world_json, params_json)
+		self.response.out.write(json.dumps({"tiles":changed_tiles}))
 	
 	# takes world json and tile coords, transforms, returns new version
 	def rotate_left(self, world_json, params_json):
-		world_state = json.loads(world_json)
+		world = json.loads(world_json)
+		params = json.loads(params_json)
 		
+		# tiles[row][column] -- world[y][x]
+		world[params[y]][params[x]] -= 1
+		world[params[y]][params[x]] %= 4 # to wrap direction around to 0
 		
+		return [{"x":params[x], "y":params[y], "direction":world[params[y]][params[x]]}]
+	
+	# takes world json and tile coords, transforms, returns new version
+	def rotate_right(self, world_json, params_json):
+		world = json.loads(world_json)
+		params = json.loads(params_json)
 		
+		# tiles[row][column] -- world[y][x]
+		world[params[y]][params[x]] += 1
+		world[params[y]][params[x]] %= 4 # to wrap direction around to 0
 		
-		
+		return world.dumps(json)
 
 urls = [
   ('/', display_game)
