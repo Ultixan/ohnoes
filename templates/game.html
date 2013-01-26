@@ -11,7 +11,12 @@
         heartbeats: {{ player.heartbeats }},
         heartrate: {{ player.heartrate }},
         x: {{ player.x }},
-        y: {{ player.y }}
+        y: {{ player.y }},
+        abilities: [
+        {% for i in abilities %}
+          {{i}},
+        {% endfor %}
+        ]
       };
       var starting_monsters = {
       {% for m in monsters %}
@@ -47,10 +52,10 @@
       </tr>
     </table>
     <ul id="actions">
-      <li id="rotate_left"></li>
-      <li id="rotate_right"></li>
-      <li id="swap_tiles"></li>
-      <li id="shift_tiles"></li>
+      <li id="rotate_left"><div class="blocker"></div></li>
+      <li id="rotate_right"><div class="blocker"></div></li>
+      <li id="swap_tiles"><div class="blocker"></div></li>
+      <li id="shift_tiles"><div class="blocker"></div></li>
     </ul>
     <div id="heart_monitor">
       <div id="beats">

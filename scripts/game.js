@@ -12,6 +12,12 @@ var hearts = [
     'medium',
     'large'
 ];
+var abilities = [
+    'rotate_right',
+    'rotate_left',
+    'swap_tiles',
+    'shift_tiles'
+];
 
 var getTileElement = function(x, y) {
     var row = $('table.grid tr:nth-child(' + (y + 2) + ')');
@@ -37,11 +43,20 @@ var updatePlayer = function(pdata) {
     player.y = pdata.y;
     player.heartbeats = pdata.heartbeats;
     player.heartrate = pdata.heartrate;
+    player.abilities = pdata.abilities;
     //Update position
     var tile = getTileElement(player.x, player.y);
     tile.append(player.element);
 
     //Update abilities
+    $.each(player.abilities, function(index, item) {
+        var blocker = $('#' + abilities[index] + ' div.blocker');
+        if (item !== 0) {
+            blocker.show();
+        } else {
+            blocker.hide();
+        }
+    });
 
     //Update heartbeats
     var percent = (player.heartbeats  * 100 / MAX_BEATS);
@@ -210,7 +225,7 @@ $(document).ready(function() {
             action = 'rotate_left';
             target.removeClass('rotate_right rotate_left');
             target.addClass('rotate_left');
-            break
+            break;
         case 119:
         case 87:
             state = 'targeting';
@@ -255,6 +270,9 @@ $(document).ready(function() {
             direction = null;
             state = 'waiting';
         }
+        ev.stopPropagation();
+    });
+    $('div.blocker').click(function(ev) {
         ev.stopPropagation();
     });
     updatePlayer(player);

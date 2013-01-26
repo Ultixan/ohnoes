@@ -39,7 +39,7 @@ def end_game_redirect(game):
     clean_up_game(game)
     
     path = template_path('results.html')
-    
+
     # send end of game data to redirect
     self.response.out.write(
             template.render(self.path, {
@@ -101,11 +101,15 @@ class display_game(webapp.RequestHandler):
                 'x': m['x'],
                 'y': m['y']
             })
+
+        p = json.loads(game.player)
+
         self.response.out.write(
             template.render(self.path, {
                 'tiles': tiles,
                 'columns': column_range,
-                'player': json.loads(game.player),
+                'player': p,
+                'abilities': p['abilities'],
                 'max_beats': max_beats,
                 'monsters': monster_details
             })
