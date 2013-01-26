@@ -75,6 +75,8 @@ $(document).ready(function() {
         return function(ev) {
             state = 'targeting';
             action = name;
+            target.removeClass('rotate_right rotate_left');
+            target.addClass(name);
             ev.stopPropagation();
         };
     };
@@ -88,7 +90,7 @@ $(document).ready(function() {
         }
     });
     tiles.click(function(ev) {
-        console.log(action);
+        target.removeClass('rotate_right', 'rotate_left');
         ev.stopPropagation();
     });
 });

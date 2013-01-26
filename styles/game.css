@@ -57,6 +57,17 @@ td.tile.left {
   padding: 0;
   margin: 0 0 20px 0;
   cursor: pointer;
+  width: 64px;
+  height: 64px;
+  background-color: #d9b464;
+}
+
+#rotate_left {
+  background-image: url('/images/rotate_left.png');
+}
+
+#rotate_right {
+  background-image: url('/images/rotate_right.png');
 }
 
 #heart_monitor {
@@ -94,4 +105,12 @@ td.tile.left {
   background-image: url('/images/Border1.png');
   top: 0;
   left: 0;
+}
+
+#target.rotate_left {
+  cursor: url('/images/rotate_left_sm.png'), pointer;
+}
+
+#target.rotate_right {
+  cursor: url('/images/rotate_right_sm.png'), pointer;
 }
