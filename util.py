@@ -42,6 +42,14 @@ def get_game(game_id):
                 row.append(randint(0,3))
             grid.append(row)
         game[0].tiles = json.dumps(grid)
+        #player
+        player = {}
+        player['heartrate']=60
+        player['heartbeats']=1000
+        player['x']=5
+        player['y']=5
+        player['objects']=[]
+        game[0].player = json.dumps(player)
         game[0].game_id = game_id
         game[0].put()
     return game[0]

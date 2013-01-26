@@ -13,11 +13,7 @@ from util import get_game
 from util import get_account
 
 def authorize(scope):
-    user = users.get_current_user()
-    if not user:
-        raise scope.redirect(
-            users.create_login_url(scope.request.uri)
-        )
+    user = users.get_current_user() 
     return user
 
 class display_game(webapp.RequestHandler):
@@ -25,6 +21,10 @@ class display_game(webapp.RequestHandler):
 
     def get(self):
         user = authorize(self)
+        if not user:
+            self.redirect(users.create_login_url(self.request.uri))
+            return
+        logging.info(user)
         account = get_account(user)
         game = get_game(account.game_id)
         tiles = []
