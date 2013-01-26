@@ -91,22 +91,47 @@ class action(webapp.RequestHandler):
 		
 		return player	
 		
-	def move_monsters(self, world, monsters, player):
-		prox_count = {'near':0, 'superclose':0}
+	def move_monsters(self, world, monsters, player, m_grid):
+		prox_count = {'near':0, 'superclose':0, 'gruesome_death' : 0}
+		
 		for m in monsters:
 			# check direction of tile
 			move_code = world[m['y']][m['x']]
 			# move monster
 			new_pos = move_pos(move_code, {'x':m['x'], 'y':m['y']})
-			m['x'] = new_pos['x']
-			m['y'] = new_pos['y']
-		
-			# calculate proximity
-			#if m['x']-player['x']<2 ||
+			# check if it can move there
+			if m_grid[new_pos['y']][new_pos['x']] == None:
+				# moving allowed! (i.e. nothing in the way)
+				m_grid[m['y']][m['x']] = None	# off of old spot
+				m_grid[new_pos['y']][new_pos['x']] = m	# onto new spot
+				# save new position
+				m['x'] = new_pos['x']
+				m['y'] = new_pos['y']
+			# if moving blocked, nothing happens
 			
-		return {'prox_count' : prox_count, 'monsters' : monsters}
-		
-    def post(self):
+			# calculate proximity
+			if abs(m['x']-player['x'])<=2 && abs(m['y']-player['y'])<=2:
+				if m['x'] == player['x'] && m['y'] == player['y']:
+					# on the same square
+					prox_count['gruesome_death'] += 1
+				elif abs(m['x']-player['x'])<=1 && abs(m['y']-player['y'])<=1:
+					# superclose
+					prox_count['superclose'] += 1
+				else
+					# nearby
+					prox_count['near'] += 1
+
+		return {'prox_count' : prox_count, 'monsters' : monsters, 'm_grid':m_grid}
+	
+	def calc_damage(self, player, prox_count):
+		player['heartrate'] += prox_count['near']*2 + prox_count['superclose']*5
+		if prox_count['near'] == 0 && prox_count['superclose'] == 0:
+			new_rate -= 10
+			player['heartrate'] = new_rate > 50 ? new_rate : 50
+		player['heartbeats'] -= player['heartrate']
+		return player
+	
+	def post(self):
         # authenticate user
         user = authorize(self)
         
@@ -155,8 +180,16 @@ class action(webapp.RequestHandler):
 				new_powerups.append(p)
 		powerups = new_powerups
 				
-		# move monsters & calculate damage
-		# loop through monsters, check for proximity to player
+		# establish monster positions
+		m_grid = []
+		for m in monsters:
+			m_grid[m['y']][m['x']] = m	
+		# move monsters	
+		monster_changes = move_monsters(world, monsters, player)
+		monsters = monster_changes['monsters']
+		m_grid = monster_changes['m_grid']
+		#calculate damage
+		player = calc_damage(player, monster_changes['prox_count'])
 		
 		# board updates!
 		# tile randomising (non-vital)
