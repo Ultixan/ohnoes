@@ -14,6 +14,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from util import template_path
 from util import get_game
 from util import get_account
+from random import choice
 from random import randint
 
 def authorize(scope):
@@ -159,6 +160,8 @@ def move_player(world, player):
 def move_monsters(world, monsters, player, m_grid, active_monsters):
     prox_count = {'near':0, 'superclose':0, 'gruesome_death' : 0}
     
+    ret_change_list = []
+    
     for a in active_monsters:
         m = monsters[a]
         # check direction of tile
@@ -170,9 +173,20 @@ def move_monsters(world, monsters, player, m_grid, active_monsters):
             # moving allowed! (i.e. nothing in the way)
             m_grid[m['y']][m['x']] = None   # off of old spot
             m_grid[new_pos['y']][new_pos['x']] = m  # onto new spot
+            
+            # if new spot points to old spot, rotate randomly
+            next_pos = move_pos(world[new_pos['y']][new_pos['x']], {'x':new_pos['x'], 'y':new_pos['y']})
+            if next_pos['x'] == m['x'] and next_pos['y'] == m['y']:
+				# the new tile points back to the previous tile and needs to be randomised
+				random_tick = choice([-1,1])
+				changes = rotate(world, monsters, player, {'x':new_pos['x'], 'y':new_pos['y']}, random_tick)
+				world[new_pos['y']][new_pos['x']] = directions[changes['world'][0]['direction']]
+				ret_change_list.append(changes['world'][0])
+            
             # save new position
             m['x'] = new_pos['x']
             m['y'] = new_pos['y']
+            
         # if moving blocked, nothing happens
         
         # calculate proximity
@@ -187,7 +201,7 @@ def move_monsters(world, monsters, player, m_grid, active_monsters):
                 # nearby
                 prox_count['near'] += 1
 
-    return {'prox_count' : prox_count, 'monsters' : monsters, 'm_grid':m_grid}
+    return {'prox_count' : prox_count, 'monsters' : monsters, 'm_grid':m_grid, 'world':world, 'change_list':ret_change_list}
 
 def calc_damage(player, prox_count):
     logging.info(prox_count)
@@ -334,8 +348,9 @@ class action(webapp.RequestHandler):
             elif change == 'monsters':
                 continue #@TODO
             elif change == 'player':
-                ability_used = changes[change]['ability_used']
-                player['abilities'][ability_codes[ability_used]] = 2
+                if changes[change]['ability_used']:
+					ability_used = changes[change]['ability_used']
+					player['abilities'][ability_codes[ability_used]] = 2
         
         # move player & pick up any powerups
         player = move_player(world, player)
@@ -361,6 +376,12 @@ class action(webapp.RequestHandler):
         monster_changes = move_monsters(world, monsters, player, m_grid, active_monsters)
         monsters = monster_changes['monsters']
         m_grid = monster_changes['m_grid']
+        world = monster_changes['world']
+        
+        # add tile changes caused by monsters
+        monster_world_change_list = monster_changes['change_list']
+        changes['world'].extend(monster_world_change_list)
+        
         #calculate damage
         player = calc_damage(player, monster_changes['prox_count'])
                 
