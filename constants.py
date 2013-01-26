@@ -7,4 +7,8 @@ directions = [
     'left'
 ]
 
+elements = {
+	'ghost' : 'darkness'
+}
+
 column_range = range(0, 12)

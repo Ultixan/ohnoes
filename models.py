@@ -3,6 +3,8 @@ from google.appengine.ext import db
 class Game(db.Model):
     game_id = db.StringProperty()
     tiles = db.StringProperty(indexed=False)
+    monsters = db.StringProperty(indexed=False)
+    powerups = db.StringProperty(indexed=False)
     player = db.StringProperty(indexed=False)
 
 class Account(db.Model):
