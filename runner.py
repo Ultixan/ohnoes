@@ -81,7 +81,8 @@ class action(webapp.RequestHandler):
 	
 
 urls = [
-  ('/', display_game)
+    ('/', display_game),
+    ('/action', action)
   ]
 
 app = webapp.WSGIApplication(urls, debug=True)
