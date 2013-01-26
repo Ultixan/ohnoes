@@ -5,6 +5,7 @@ import logging
 from constants import directions
 from constants import column_range
 from constants import max_beats
+from constants import monster_spawn_rate
 from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
@@ -181,10 +182,12 @@ def move_monsters(world, monsters, player, m_grid, active_monsters):
     return {'prox_count' : prox_count, 'monsters' : monsters, 'm_grid':m_grid}
 
 def calc_damage(player, prox_count):
+    logging.info(prox_count)
     new_rate = player['heartrate'] + prox_count['near']*2 + prox_count['superclose']*5
+    logging.info('heart_rate: ' + str(new_rate))
     if prox_count['near'] == 0 and prox_count['superclose'] == 0:
         new_rate -= 10
-        player['heartrate'] = new_rate if new_rate > 50 else 50
+    player['heartrate'] = new_rate if new_rate > 50 else 50
     player['heartbeats'] -= player['heartrate']
     return player
 
@@ -350,7 +353,7 @@ class action(webapp.RequestHandler):
         # board updates!
         # tile randomising (non-vital)
         # monster spawning
-        if game.turn_count % 5 == 0:
+        if game.turn_count % monster_spawn_rate == 0:
             spawn_results = spawn_monster(monsters, active_monsters, player, m_grid)
             monsters = spawn_results['monsters']
             active_monsters = spawn_results['active_monsters']

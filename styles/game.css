@@ -176,6 +176,27 @@ span.boogey {
 span.stove {
   background-image: url('/images/stove.png');
 }
+
+span.orb {
+  background-image: url('/images/Darkness.png');
+}
+
+span.rat {
+  background-image: url('/images/rat.png');
+}
+
+span.spider {
+  background-image: url('/images/Spider.png');
+}
+
+span.jelly {
+  background-image: url('/images/jellyfish.png');
+}
+
+span.snake {
+  background-image: url('/images/snake.png');
+}
+
 #target.up_cursor {
   cursor: n-resize;
 }
