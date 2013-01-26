@@ -131,7 +131,8 @@ def rotate(world, mosters, player, params, tick):
             'x': x,
             'y': y,
             'direction': direction
-        }]
+        }],
+        'player': {'ability_used':'swap_tiles'}
         }
 def rotate_left(world, monsters, player, params):
     return rotate(world, monsters, player, params, -1)
@@ -212,6 +213,8 @@ def shift_tiles(world, monsters, player, params):
         for i in range(10):
             changes['world'].append({'x':x,'y':i,'direction':world[(i-1)%10][x]})
     
+    # save timeout on player abilities
+    changes['player'] = {'ability_used':'shift_tiles'}
     return changes
 
 def swap_tiles(world, monsters, player, params):
@@ -240,6 +243,9 @@ def swap_tiles(world, monsters, player, params):
         changes['world'][0]['direction']=world[(y+1)%10][x]
         changes['world'][1]['y']+=1
         changes['world'][1]['y']%=10
+    
+    # save timeout on player abilities
+    changes['player'] = {'ability_used':'swap_tiles'}
     
     return changes
 
@@ -298,10 +304,10 @@ class action(webapp.RequestHandler):
         player = json.loads(game.player)
         
         # FIRST update allowed actions (i.e. a turn has passed for them)
-        #for a in player['abilities']:
-        #    if a > 0:
-        #        a -= 1
-        #@TODO update countdown on powerups on board
+        for a in player['abilities']:
+            if a > 0:
+                a -= 1
+        # update countdown on powerups
         
         # THEN perform new action && make it invalid
         # get action params from POST
@@ -321,7 +327,8 @@ class action(webapp.RequestHandler):
             elif change == 'monsters':
                 continue #@TODO
             elif change == 'player':
-                continue #@TODO
+                ability_used = changes[change]['ability_used']
+                player['abilities'][ability_codes[ability_used]] = 2
         
         # move player & pick up any powerups
         player = move_player(world, player)
