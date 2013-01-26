@@ -21,7 +21,7 @@ def authorize(scope):
     user = users.get_current_user() 
     return user
 
-def end_game_redirect(game):
+def end_game_redirect(self,game):
     world = json.loads(game.tiles)
     #monsters = json.loads(game.monsters)
     #active_monsters = json.loads(game.active_monsters)
@@ -45,7 +45,7 @@ def end_game_redirect(game):
     self.response.out.write(
             template.render(self.path, {
                 'heartrate': last_heartrate,
-                'heartbeat': last_heartbeat,
+                'heartbeat': last_heartbeats,
                 'monsters': json.loads(monsters),
                 'active_monsters': json.loads(active_monsters),
                 'turns': turns_lasted
@@ -85,7 +85,7 @@ class display_game(webapp.RequestHandler):
         
         # check for death condition
         if game.is_dead == 1:
-            end_game_redirect(game)
+            end_game_redirect(self, game)
         
         tiles = []
         for row in json.loads(game.tiles):

@@ -137,6 +137,28 @@ var playBeat = function() {
 //    audio[0].load();
 //    audio[0].play();
 };
+function choice(arr){
+    var c = arr.length;
+    var f = Math.random();
+    var i = Math.floor(c*f);
+    return arr[i];
+};
+var replay_audio = function() {
+    document.getElementById('soundtrack').load();
+    document.getElementById('soundtrack').play();
+};
+var choose_glitch = function() {
+    if(choice([1,2,3])==1){
+        var id='glitch'+choice(['1','2','3']);
+        document.getElementById(id).load();
+        document.getElementById(id).play();
+    }
+    else
+    {
+        document.getElementById('soundtrack').load();
+        document.getElementById('soundtrack').play();
+    }
+};
 var beat2 = function() {
     playBeat();
     manageBeat();
