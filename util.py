@@ -34,7 +34,6 @@ def get_game(game_id):
         game_id)
     if game.count() < 1:
         game = [Game()]
-        import uuid
         grid = []
         for i in range(0, 10):
             row = []
@@ -44,7 +43,7 @@ def get_game(game_id):
         game[0].tiles = json.dumps(grid)
         #player
         player = {}
-        player['heartrate']=60
+        player['heartrate']=50
         player['heartbeats']=1000
         player['x']=5
         player['y']=5

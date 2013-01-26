@@ -65,9 +65,60 @@ class action(webapp.RequestHandler):
         
         return [{'change_type':'world', 'change':{'x':params[x], 'y':params[y], 'direction':world[params[y]][params[x]]}}]
 
+    def shift_tiles(self, world, monsters, player, params):
+        #Get the direction. If it's left or right, x++ for all x in world[params[y]]
+        #If it's top or bottom, y++ for all y in world[params[x]]
+        direction=params['direction']
+        changes=[]
+
+        if direction == "left":
+            for i in range(10):
+                changes.append({'change_type':'world','change':{'x':i,'y':params['y'],'direction':world[params['y']][params[(i-1)%10]]}})
+        elif direction == "right":
+            for i in range(10):
+                changes.append({'change_type':'world','change':{'x':i,'y':params['y'],'direction':world[params['y']][params[(i+1)%10]]}})
+        elif direction == "up":
+            for i in range(10):
+                changes.append({'change_type':'world','change':{'x':params['x'],'y':i,'direction':world[params[(i-1)%10]][params['x']]}})
+        elif direction == "down": 
+            for i in range(10):
+                changes.append({'change_type':'world','change':{'x':params['x'],'y':i,'direction':world[params[(i+1)%10]][params['x']]}})
+        
+        return changes
+ 
+    def swap_tiles(self, world, monsters, player, params):
+        direction=params['direction']
+
+        # We have two tiles changing: Which two depends on the direction. Set both of them to x and y in the meantime 
+        changes=[]
+        changes.append({'change_type':'world','change':{'x':params['x'],'y':params['y'],'direction':world[params['y']][params['x']]}})
+        changes.append({'change_type':'world','change':{'x':params['x'],'y':params['y'],'direction':world[params['y']][params['x']]}})
+
+        if direction == 'left':
+            changes[0]['change']['direction']=world[params['y']][(params['x']-1)%10]
+            changes[1]['change']['x']-=1
+            changes[1]['change']['x']%=10
+        elif direction == 'right':
+            changes[0]['change']['direction']=world[params['y']][(params['x']+1)%10]
+            changes[1]['change']['x']+=1
+            changes[1]['change']['x']%=10
+        elif direction == 'top':
+            changes[0]['change']['direction']=world[(params['y']-1)%10][params['x']]
+            changes[1]['change']['y']-=1
+            changes[1]['change']['y']%=10
+        elif direction == 'bottom':
+            changes[0]['change']['direction']=world[(params['y']+1)%10][params['x']]
+            changes[1]['change']['y']+=1
+            changes[1]['change']['y']%=10
+        
+        return changes
+
+
     actions = {
         'rotate_right': rotate_right,
-        'rotate_left': rotate_left
+        'rotate_left': rotate_left,
+        'shift_tiles':shift_tiles,
+        'swap_tiles':swap_tiles
     }
 
 	def move_pos(self, move_code, coords):	
@@ -132,14 +183,17 @@ class action(webapp.RequestHandler):
 		return player
 	
 	def post(self):
+
         # authenticate user
         user = authorize(self)
         
         # get world state (from user)
         game = get_game(get_account(user).game_id)
         world = json.loads(game.tiles)
+
         monsters = json.loads(game.monsters)
         powerups = json.loads(game.powerups)
+
         player = json.loads(game.player)
         
         # FIRST update allowed actions (i.e. a turn has passed for them)
@@ -151,11 +205,15 @@ class action(webapp.RequestHandler):
         # THEN perform new action && make it invalid
         # get action params from POST
         params_json = self.request.body;
+
+        logging.info("JSON = " + str(json.loads('{"action":"x"}')))
         # get action key
         action_key = json.loads(params_json)['action']
-        
+       
+        logging.info("Action key = " + action_key)
+
         # calculate action on the world
-        changes = actions[action_key](world, monsters, player, params_json)
+        changes = self.actions[action_key](world, monsters, player, json.loads(params_json))
         
         # loop through changes and apply
         for c in changes:
@@ -199,9 +257,9 @@ class action(webapp.RequestHandler):
         # save the changed world
         game.tiles = json.dumps(world)
         # save the new monster positions
-        game.monsters = json.dumps(monsters)
+        #game.monsters = json.dumps(monsters)
         # save the new powerup positions
-        game.powerups = json.dumps(powerups)
+        #game.powerups = json.dumps(powerups)
         # save the updated health
         game.player = json.dumps(player)
         
@@ -209,7 +267,10 @@ class action(webapp.RequestHandler):
         
         # response: send changes!
         self.response.out.write(json.dumps(changes))
-    
+
+    def get(self):
+        self.request.body=str(self.request.get('post'))
+        self.post()
 
 urls = [
     ('/', display_game),
