@@ -142,16 +142,16 @@ def shift_tiles(world, monsters, player, params):
 
     if direction == "left":
         for i in range(10):
-            changes['world'].append({'x':i,'y':y,'direction':world[y][(i-1)%10]})
+            changes['world'].append({'x':i,'y':y,'direction':world[y][(i+1)%10]})
     elif direction == "right":
         for i in range(10):
-            changes['world'].append({'x':i,'y':y,'direction':world[y][(i+1)%10]})
+            changes['world'].append({'x':i,'y':y,'direction':world[y][(i-1)%10]})
     elif direction == "up":
         for i in range(10):
-            changes['world'].append({'x':x,'y':i,'direction':world[(i-1)%10][x]})
+            changes['world'].append({'x':x,'y':i,'direction':world[(i+1)%10][x]})
     elif direction == "down": 
         for i in range(10):
-            changes['world'].append({'x':x,'y':i,'direction':world[(i+1)%10][x]})
+            changes['world'].append({'x':x,'y':i,'direction':world[(i-1)%10][x]})
     
     return changes
 
