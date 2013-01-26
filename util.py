@@ -3,6 +3,7 @@ import os
 
 from constants import template_dir
 from constants import max_beats
+from constants import elements
 from google.appengine.ext import db
 from models import Account
 from models import Game
@@ -50,10 +51,17 @@ def get_game(game_id):
             'y': 5,
             'objects': []
         }
-        monsters = []
+        monsters = {}
+        for monster in elements.keys():
+            monsters[monster] = {
+                'x': -1,
+                'y': -1
+            }
         powerups = []
+        active_monsters = []
         game.player = json.dumps(player)
         game.monsters = json.dumps(monsters)
+        game.active_monsters = json.dumps(active_monsters)
         game.powerups = json.dumps(powerups)
         game.game_id = game_id
         game.turn_count = 0

@@ -81,10 +81,11 @@ def move_player(world, player):
     
     return player   
     
-def move_monsters(world, monsters, player, m_grid):
+def move_monsters(world, monsters, player, m_grid, active_monsters):
     prox_count = {'near':0, 'superclose':0, 'gruesome_death' : 0}
     
-    for m in monsters:
+    for a in active_monsters:
+        m = monsters[a]
         # check direction of tile
         move_code = world[m['y']][m['x']]
         # move monster
@@ -170,34 +171,35 @@ def swap_tiles(world, monsters, player, params):
     return changes
 
 def gen_rand_coords():
-	# gen random coords
-	x = randint(0, 99)
-	y = randint(0, 99)
-	return {'x':x, 'y':y}
+    # gen random coords
+    x = randint(0, 99)
+    y = randint(0, 99)
+    return {'x':x, 'y':y}
 
 def spawn_monster(monsters, active_monsters, player, m_grid):
-	# get free monsters
-	free_monsters = []
-	for key in monsters.keys():
-		if key not in active_monsters:
-			free_monsters.append(key)
-			
-	while (true):
-		coords = gen_rand_coords()
-		x = coords['x']
-		y = coords['y']
-		# check if space is free
-		if m_grid[y][x] is None and not (player['x'] == x and player['y'] == y):
-			# if so, spawn random free monster there and break
-			new_monst = free_monsters[randint(0, len(free_monsters))]
-			monsters[new_monst]['x'] = x
-			monsters[new_monst]['y'] = y
-			active_monsters.append(new_monst)
-			break
-		# else loop again
-		
-	# when monster has spawned, return updated lists
-	return {'monsters':monsters, 'active_monsters':active_monsters}
+    # get free monsters
+    free_monsters = []
+    for key in monsters.keys():
+        if key not in active_monsters:
+            free_monsters.append(key)
+
+    if len(free_monsters) > 0:
+        while (True):
+            coords = gen_rand_coords()
+            x = coords['x']
+            y = coords['y']
+            # check if space is free
+            if (y not in m_grid or x not in m_grid[y]) and not (player['x'] == x and player['y'] == y):
+                # if so, spawn random free monster there and break
+                new_monst = free_monsters[randint(0, len(free_monsters) - 1)]
+                monsters[new_monst]['x'] = x
+                monsters[new_monst]['y'] = y
+                active_monsters.append(new_monst)
+                break
+            # else loop again
+        
+    # when monster has spawned, return updated lists
+    return {'monsters':monsters, 'active_monsters':active_monsters}
 
 actions = {
     'rotate_right': rotate_right,
@@ -260,10 +262,16 @@ class action(webapp.RequestHandler):
                 
         # establish monster positions
         m_grid = []
-        for m in monsters:
+        for i in range(0,9):
+            row = []
+            for j in range(0,9):
+                row.append(None)
+            m_grid.append(row)
+        for a in active_monsters:
+            m = monsters[a]
             m_grid[m['y']][m['x']] = m  
         # move monsters 
-        monster_changes = move_monsters(world, monsters, player, m_grid)
+        monster_changes = move_monsters(world, monsters, player, m_grid, active_monsters)
         monsters = monster_changes['monsters']
         m_grid = monster_changes['m_grid']
         #calculate damage
@@ -273,9 +281,9 @@ class action(webapp.RequestHandler):
         # tile randomising (non-vital)
         # monster spawning
         if game.turn_count % 5 == 0:
-			spawn_results = spawn_monster(monsters, active_monsters, player, m_grid)
-			monsters = spawn_results['monsters']
-			active_monsters = spawn_results['active_monsters']
+            spawn_results = spawn_monster(monsters, active_monsters, player, m_grid)
+            monsters = spawn_results['monsters']
+            active_monsters = spawn_results['active_monsters']
         
         # powerup drops
         
