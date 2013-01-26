@@ -6,3 +6,5 @@ directions = [
     'down',
     'left'
 ]
+
+column_range = range(0, 12)

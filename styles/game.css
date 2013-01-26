@@ -2,20 +2,31 @@ table.grid {
   border: none;
   padding: 0;
   border-collapse: collapse;
-  margin: 0 auto;
+  margin: 20px auto 0;
 }
 
-table.grid td {
+table.grid td.tile {
   height: 64px;
   width: 64px;
   background-color: #DEDEDE;
   padding: 0;
   margin: 0;
+  position: relative;
 }
 
-table.grid tr:nth-child(odd) td:nth-child(even), 
-table.grid tr:nth-child(even) td:nth-child(odd) {
+table.grid tr:nth-child(odd) td.tile:nth-child(even), 
+table.grid tr:nth-child(even) td.tile:nth-child(odd) {
   background-color: #C7C7C7;
+}
+
+table.grid td.shifter.left,
+table.grid td.shifter.right {
+    width: 20px;
+}
+
+table.grid td.shifter.top,
+table.grid td.shifter.bottom {
+    height: 20px;
 }
 
 td.tile.up {
@@ -32,4 +43,55 @@ td.tile.down {
 
 td.tile.left {
   background-image: url('/images/tile_feet5.png');
+}
+
+#actions {
+    position: absolute;
+    top: 0;
+    color: white;
+    padding: 0;
+}
+
+#actions li {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px 0;
+  cursor: pointer;
+}
+
+#heart_monitor {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 50px;
+  height: 300px;
+}
+
+#beats {
+  width: 20px;
+  height: 200px;
+  background: red;
+  border: 2px solid yellow;
+}
+
+#bar {
+  width: 100%;
+  height: 0%;
+  background: black;
+}
+
+#player {
+  display: inline-block;
+  height: 64px;
+  width: 64px;
+  background-image: url('/images/face.png');
+}
+
+#target {
+  height: 64px;
+  width: 64px;
+  position: absolute;
+  background-image: url('/images/Border1.png');
+  top: 0;
+  left: 0;
 }
