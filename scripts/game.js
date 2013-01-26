@@ -47,6 +47,18 @@ var updatePlayer = function(pdata) {
     //Update position
     var tile = getTileElement(player.x, player.y);
     tile.append(player.element);
+    player.element.removeClass('happy nervoud worried scared terrified');
+    if (player.heartrate > 170) {
+        player.element.addClass('terrified');
+    } else if (player.heartrate > 140) {
+        player.element.addClass('scared');
+    } else if (player.heartrate > 110) {
+        player.element.addClass('worried');
+    } else if (player.heartrate > 80) {
+        player.element.addClass('nervous');
+    } else {
+        player.element.addClass('happy');
+    }
 
     //Update abilities
     $.each(player.abilities, function(index, item) {

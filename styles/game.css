@@ -132,9 +132,29 @@ table.grid td.tile.current {
 
 #player {
   display: inline-block;
-  height: 64px;
-  width: 64px;
-  background-image: url('/images/face.png');
+  height: 50px;
+  width: 50px;
+  background-image: url('/images/player.png');
+}
+
+#player.happy {
+  background-position: 0 0;
+}
+
+#player.nervous {
+  background-position: 0 200px;
+}
+
+#player.worried {
+  background-position: 0 150px;
+}
+
+#player.scared {
+  background-position: 0 100px;
+}
+
+#player.terrified {
+  background-position: 0 50px;
 }
 
 #target {
