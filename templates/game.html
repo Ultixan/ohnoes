@@ -3,6 +3,17 @@
     <title>Oh Noes!</title>
     <link rel="stylesheet" href="styles/common.css"/>
     <link rel="stylesheet" href="styles/game.css"/>
+    <script src="scripts/jq.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      var MAX_BEATS = {{ max_beats }};
+      var player = {
+        element: $('<span id="player"/>'),
+        heartbeats: {{ player.heartbeats }},
+        heartrate: {{ player.heartrate }},
+        x: {{ player.x }},
+        y: {{ player.y }}
+      };
+    </script>
   </head>
   <body>
     <table class="grid">
@@ -39,7 +50,6 @@
       <div id="heart"></div>
       <div id="rate"></div>
     </div>
-    <script src="scripts/jq.js" type="text/javascript"></script>
     <script src="scripts/game.js" type="text/javascript"></script>
   </body>
 </html>

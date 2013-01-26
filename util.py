@@ -2,6 +2,7 @@ import json
 import os
 
 from constants import template_dir
+from constants import max_beats
 from google.appengine.ext import db
 from models import Account
 from models import Game
@@ -43,8 +44,8 @@ def get_game(game_id):
             grid.append(row)
         game.tiles = json.dumps(grid)
         player = {
-            'heartrate': 60,
-            'heartbeats': 1000,
+            'heartrate': 50,
+            'heartbeats': max_beats,
             'x': 5,
             'y': 5,
             'objects': []
