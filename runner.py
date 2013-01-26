@@ -39,6 +39,17 @@ class display_game(webapp.RequestHandler):
             })
         )
 
+def move_pos(move_code, coords):  
+    if move_code == 0:
+        coords['y'] = (coords['y']-1)%10
+    elif move_code == 1:
+        coords['x'] = (coords['x']+1)%10
+    elif move_code == 2:
+        coords['y'] = (coords['y']+1)%10
+    elif move_code == 3:
+        coords['x'] = (coords['x']-1)%10
+    return coords;
+    
 def rotate(world, mosters, player, params, tick):
     x = params['x']
     y = params['y']
@@ -56,121 +67,112 @@ def rotate_left(world, monsters, player, params):
 def rotate_right(world, monsters, player, params):
     return rotate(world, monsters, player, params, 1)
 
+def move_player(world, player):
+    # check direction of tile
+    move_code = world[player['y']][player['x']]
+    # move player
+    new_pos = move_pos(move_code, {'x':player['x'], 'y':player['y']})
+    player['x'] = new_pos['x']
+    player['y'] = new_pos['y']
+    
+    return player   
+    
+def move_monsters(world, monsters, player, m_grid):
+    prox_count = {'near':0, 'superclose':0, 'gruesome_death' : 0}
+    
+    for m in monsters:
+        # check direction of tile
+        move_code = world[m['y']][m['x']]
+        # move monster
+        new_pos = move_pos(move_code, {'x':m['x'], 'y':m['y']})
+        # check if it can move there
+        if m_grid[new_pos['y']][new_pos['x']] == None:
+            # moving allowed! (i.e. nothing in the way)
+            m_grid[m['y']][m['x']] = None   # off of old spot
+            m_grid[new_pos['y']][new_pos['x']] = m  # onto new spot
+            # save new position
+            m['x'] = new_pos['x']
+            m['y'] = new_pos['y']
+        # if moving blocked, nothing happens
+        
+        # calculate proximity
+        if abs(m['x']-player['x'])<=2 and abs(m['y']-player['y'])<=2:
+            if m['x'] == player['x'] and m['y'] == player['y']:
+                # on the same square
+                prox_count['gruesome_death'] += 1
+            elif abs(m['x']-player['x'])<=1 and abs(m['y']-player['y'])<=1:
+                # superclose
+                prox_count['superclose'] += 1
+            else:
+                # nearby
+                prox_count['near'] += 1
+
+    return {'prox_count' : prox_count, 'monsters' : monsters, 'm_grid':m_grid}
+
+def calc_damage(player, prox_count):
+    new_rate = player['heartrate'] + prox_count['near']*2 + prox_count['superclose']*5
+    if prox_count['near'] == 0 and prox_count['superclose'] == 0:
+        new_rate -= 10
+        player['heartrate'] = new_rate if new_rate > 50 else 50
+    player['heartbeats'] -= player['heartrate']
+    return player
+
+def shift_tiles(world, monsters, player, params):
+    #Get the direction. If it's left or right, x++ for all x in world[params[y]]
+    #If it's top or bottom, y++ for all y in world[params[x]]
+    direction=params['direction']
+    changes=[]
+
+    if direction == "left":
+        for i in range(10):
+            changes.append({'change_type':'world','change':{'x':i,'y':params['y'],'direction':world[params['y']][params[(i-1)%10]]}})
+    elif direction == "right":
+        for i in range(10):
+            changes.append({'change_type':'world','change':{'x':i,'y':params['y'],'direction':world[params['y']][params[(i+1)%10]]}})
+    elif direction == "up":
+        for i in range(10):
+            changes.append({'change_type':'world','change':{'x':params['x'],'y':i,'direction':world[params[(i-1)%10]][params['x']]}})
+    elif direction == "down": 
+        for i in range(10):
+            changes.append({'change_type':'world','change':{'x':params['x'],'y':i,'direction':world[params[(i+1)%10]][params['x']]}})
+    
+    return changes
+
+def swap_tiles(world, monsters, player, params):
+    direction=params['direction']
+
+    # We have two tiles changing: Which two depends on the direction. Set both of them to x and y in the meantime 
+    changes=[]
+    changes.append({'change_type':'world','change':{'x':params['x'],'y':params['y'],'direction':world[params['y']][params['x']]}})
+    changes.append({'change_type':'world','change':{'x':params['x'],'y':params['y'],'direction':world[params['y']][params['x']]}})
+
+    if direction == 'left':
+        changes[0]['change']['direction']=world[params['y']][(params['x']-1)%10]
+        changes[1]['change']['x']-=1
+        changes[1]['change']['x']%=10
+    elif direction == 'right':
+        changes[0]['change']['direction']=world[params['y']][(params['x']+1)%10]
+        changes[1]['change']['x']+=1
+        changes[1]['change']['x']%=10
+    elif direction == 'top':
+        changes[0]['change']['direction']=world[(params['y']-1)%10][params['x']]
+        changes[1]['change']['y']-=1
+        changes[1]['change']['y']%=10
+    elif direction == 'bottom':
+        changes[0]['change']['direction']=world[(params['y']+1)%10][params['x']]
+        changes[1]['change']['y']+=1
+        changes[1]['change']['y']%=10
+    
+    return changes
+
 actions = {
     'rotate_right': rotate_right,
-    'rotate_left': rotate_left
+    'rotate_left': rotate_left,
+    'shift_tiles': shift_tiles,
+    'swap_tiles': swap_tiles
 }
 
 class action(webapp.RequestHandler):
-    def move_pos(self, move_code, coords):  
-        if move_code == 0:
-            coords['y'] = (coords['y']-1)%10
-        elif move_code == 1:
-            coords['x'] = (coords['x']+1)%10
-        elif move_code == 2:
-            coords['y'] = (coords['y']+1)%10
-        elif move_code == 3:
-            coords['x'] = (coords['x']-1)%10
-        return coords;
-        
-    def shift_tiles(self, world, monsters, player, params):
-        #Get the direction. If it's left or right, x++ for all x in world[params[y]]
-        #If it's top or bottom, y++ for all y in world[params[x]]
-        direction=params['direction']
-        changes=[]
-
-        if direction == "left":
-            for i in range(10):
-                changes.append({'change_type':'world','change':{'x':i,'y':params['y'],'direction':world[params['y']][params[(i-1)%10]]}})
-        elif direction == "right":
-            for i in range(10):
-                changes.append({'change_type':'world','change':{'x':i,'y':params['y'],'direction':world[params['y']][params[(i+1)%10]]}})
-        elif direction == "up":
-            for i in range(10):
-                changes.append({'change_type':'world','change':{'x':params['x'],'y':i,'direction':world[params[(i-1)%10]][params['x']]}})
-        elif direction == "down": 
-            for i in range(10):
-                changes.append({'change_type':'world','change':{'x':params['x'],'y':i,'direction':world[params[(i+1)%10]][params['x']]}})
-        
-        return changes
- 
-    def swap_tiles(self, world, monsters, player, params):
-        direction=params['direction']
-
-        # We have two tiles changing: Which two depends on the direction. Set both of them to x and y in the meantime 
-        changes=[]
-        changes.append({'change_type':'world','change':{'x':params['x'],'y':params['y'],'direction':world[params['y']][params['x']]}})
-        changes.append({'change_type':'world','change':{'x':params['x'],'y':params['y'],'direction':world[params['y']][params['x']]}})
-
-        if direction == 'left':
-            changes[0]['change']['direction']=world[params['y']][(params['x']-1)%10]
-            changes[1]['change']['x']-=1
-            changes[1]['change']['x']%=10
-        elif direction == 'right':
-            changes[0]['change']['direction']=world[params['y']][(params['x']+1)%10]
-            changes[1]['change']['x']+=1
-            changes[1]['change']['x']%=10
-        elif direction == 'top':
-            changes[0]['change']['direction']=world[(params['y']-1)%10][params['x']]
-            changes[1]['change']['y']-=1
-            changes[1]['change']['y']%=10
-        elif direction == 'bottom':
-            changes[0]['change']['direction']=world[(params['y']+1)%10][params['x']]
-            changes[1]['change']['y']+=1
-            changes[1]['change']['y']%=10
-        
-        return changes
-
-    def move_player(self, world, player):
-        # check direction of tile
-        move_code = world[player['y']][player['x']]
-        # move player
-        new_pos = move_pos(move_code, {'x':player['x'], 'y':player['y']})
-        player['x'] = new_pos['x']
-        player['y'] = new_pos['y']
-        
-        return player   
-        
-    def move_monsters(self, world, monsters, player, m_grid):
-        prox_count = {'near':0, 'superclose':0, 'gruesome_death' : 0}
-        
-        for m in monsters:
-            # check direction of tile
-            move_code = world[m['y']][m['x']]
-            # move monster
-            new_pos = move_pos(move_code, {'x':m['x'], 'y':m['y']})
-            # check if it can move there
-            if m_grid[new_pos['y']][new_pos['x']] == None:
-                # moving allowed! (i.e. nothing in the way)
-                m_grid[m['y']][m['x']] = None   # off of old spot
-                m_grid[new_pos['y']][new_pos['x']] = m  # onto new spot
-                # save new position
-                m['x'] = new_pos['x']
-                m['y'] = new_pos['y']
-            # if moving blocked, nothing happens
-            
-            # calculate proximity
-            if abs(m['x']-player['x'])<=2 and abs(m['y']-player['y'])<=2:
-                if m['x'] == player['x'] and m['y'] == player['y']:
-                    # on the same square
-                    prox_count['gruesome_death'] += 1
-                elif abs(m['x']-player['x'])<=1 and abs(m['y']-player['y'])<=1:
-                    # superclose
-                    prox_count['superclose'] += 1
-                else:
-                    # nearby
-                    prox_count['near'] += 1
-
-        return {'prox_count' : prox_count, 'monsters' : monsters, 'm_grid':m_grid}
-    
-    def calc_damage(self, player, prox_count):
-        player['heartrate'] += prox_count['near']*2 + prox_count['superclose']*5
-        if prox_count['near'] == 0 and prox_count['superclose'] == 0:
-            new_rate -= 10
-            player['heartrate'] = new_rate if new_rate > 50 else 50
-        player['heartbeats'] -= player['heartrate']
-        return player
-    
     def post(self):
 
         # authenticate user
@@ -186,9 +188,9 @@ class action(webapp.RequestHandler):
         player = json.loads(game.player)
         
         # FIRST update allowed actions (i.e. a turn has passed for them)
-        for a in player['abilities']:
-            if a > 0:
-                a -= 1
+        #for a in player['abilities']:
+        #    if a > 0:
+        #        a -= 1
         #@TODO update countdown on powerups on board
         
         # THEN perform new action && make it invalid
@@ -212,7 +214,7 @@ class action(webapp.RequestHandler):
                 continue #@TODO
         
         # move player & pick up any powerups
-        player = move_player(world, player, powerups)
+        player = move_player(world, player)
         new_powerups = []
         for p in powerups:
             if (p['x'] == player['x'] and p['y'] == player['y']): # if there is a powerup on the square
@@ -220,22 +222,22 @@ class action(webapp.RequestHandler):
             else:
                 new_powerups.append(p)
         powerups = new_powerups
-				
-		# establish monster positions
-		m_grid = []
-		for m in monsters:
-			m_grid[m['y']][m['x']] = m	
-		# move monsters	
-		monster_changes = move_monsters(world, monsters, player)
-		monsters = monster_changes['monsters']
-		m_grid = monster_changes['m_grid']
-		#calculate damage
-		player = calc_damage(player, monster_changes['prox_count'])
-		
-		# board updates!
-		# tile randomising (non-vital)
-		# monster spawning
-		# powerup drops        
+                
+        # establish monster positions
+        m_grid = []
+        for m in monsters:
+            m_grid[m['y']][m['x']] = m  
+        # move monsters 
+        monster_changes = move_monsters(world, monsters, player, m_grid)
+        monsters = monster_changes['monsters']
+        m_grid = monster_changes['m_grid']
+        #calculate damage
+        player = calc_damage(player, monster_changes['prox_count'])
+        
+        # board updates!
+        # tile randomising (non-vital)
+        # monster spawning
+        # powerup drops        
         # move monsters & calculate damage
         # loop through monsters, check for proximity to player
         
