@@ -49,7 +49,7 @@ def get_game(game_id):
             'heartbeats': max_beats,
             'x': 5,
             'y': 5,
-            'objects': []
+            'abilities':[ 0, 0, 0, 0 ]
         }
         monsters = {}
         for monster in elements.keys():
@@ -65,6 +65,7 @@ def get_game(game_id):
         game.powerups = json.dumps(powerups)
         game.game_id = game_id
         game.turn_count = 0
+        game.is_dead = 0
         game.put()
     else:
         game = game[0]
