@@ -8,6 +8,7 @@ from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 from util import template_path
 from util import get_game
+from util import get_account
 
 def authorize(scope):
     user = users.get_current_user()
@@ -22,7 +23,8 @@ class display_game(webapp.RequestHandler):
 
     def get(self):
         user = authorize(self)
-        game = get_game('bar')
+		account = get_account(user)
+        game = get_game(account.game_id)
         tiles = []
         for row in json.loads(game.tiles):
             newRow = []
