@@ -62,28 +62,28 @@ class action(webapp.RequestHandler):
         
         # NB @TODO update actual stored world file??
         return [{'change_type':'world', 'change':{'x':params[x], 'y':params[y], 'direction':world[params[y]][params[x]]}}]
-	
+
     actions = {
         'rotate_right': rotate_right,
         'rotate_left': rotate_left
     }
 
-	def move(self, move_code, coords):	
-		if move_code == 0:
-			coords['y'] = (coords[y]-1)%10
-		elif move_code == 1:
-			coords['x'] = (coords[x]+1)%10
-		elif move_code == 2:
-			coords['y'] = (coords[y]+1)%10
-		elif move_code == 2:
-			coords['x'] = (coords[x]-1)%10
-		return coords;
+    def move(self, move_code, coords):
+        if move_code == 0:
+            coords['y'] = (coords[y]-1)%10
+        elif move_code == 1:
+            coords['x'] = (coords[x]+1)%10
+        elif move_code == 2:
+            coords['y'] = (coords[y]+1)%10
+        elif move_code == 2:
+            coords['x'] = (coords[x]-1)%10
+        return coords;
         
     def move_player(self, world, player, powerups):
-		# check direction of tile
-		move_code = world[player['y']][player['x']]
-		
-		
+        # check direction of tile
+        move_code = world[player['y']][player['x']]
+        
+        
     def post(self):
         # authenticate user
         user = authorize(self)
@@ -105,25 +105,25 @@ class action(webapp.RequestHandler):
         
         # loop through changes and apply
         for c in changes:
-			if c['change_type'] == 'world':
-				x = c['change']['x']
-				y = c['change']['y']
-				direction = c['change']['direction']
-				world[y][x] = direction
-			elif c['change_type'] == 'monsters':
-				continue #@TODO
-			elif c['change_type'] == 'player':
-				continue #@TODO
-		
-		# move player & pick up any powerups
-		move_player(world, player, powerups)
-		# move monsters & calculate damage
-		# loop through monsters, check for proximity to player
-		
-		# board updates!
-		# tile randomising (non-vital)
-		# monster spawning
-		# powerup drops
+            if c['change_type'] == 'world':
+                x = c['change']['x']
+                y = c['change']['y']
+                direction = c['change']['direction']
+                world[y][x] = direction
+            elif c['change_type'] == 'monsters':
+                continue #@TODO
+            elif c['change_type'] == 'player':
+                continue #@TODO
+        
+        # move player & pick up any powerups
+        move_player(world, player, powerups)
+        # move monsters & calculate damage
+        # loop through monsters, check for proximity to player
+        
+        # board updates!
+        # tile randomising (non-vital)
+        # monster spawning
+        # powerup drops
         
         
         # save the changed world
