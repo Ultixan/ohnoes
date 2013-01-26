@@ -8,7 +8,18 @@ directions = [
 ]
 
 elements = {
-	'ghost' : 'darkness'
+	'ghost' : 'dark',
+	'orb'	: 'dark',
+	'boogey': 'dark',
+	'stove'	: 'fire',
+	'match' : 'fire',
+	'flame' : 'fire',
+	'jelly' : 'water',
+	'shark' : 'water',
+	'octo'	: 'water',
+	'spider': 'crawlies',
+	'rat'	: 'crawlies',
+	'snake' : 'crawlies'
 }
 
 column_range = range(0, 12)

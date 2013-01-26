@@ -12,6 +12,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from util import template_path
 from util import get_game
 from util import get_account
+from random import randint
 
 def authorize(scope):
     user = users.get_current_user() 
@@ -168,6 +169,36 @@ def swap_tiles(world, monsters, player, params):
     
     return changes
 
+def gen_rand_coords():
+	# gen random coords
+	x = randint(0, 99)
+	y = randint(0, 99)
+	return {'x':x, 'y':y}
+
+def spawn_monster(monsters, active_monsters, player, m_grid):
+	# get free monsters
+	free_monsters = []
+	for key in monsters.keys():
+		if key not in active_monsters:
+			free_monsters.append(key)
+			
+	while (true):
+		coords = gen_rand_coords()
+		x = coords['x']
+		y = coords['y']
+		# check if space is free
+		if m_grid[y][x] is None and not (player['x'] == x and player['y'] == y):
+			# if so, spawn random free monster there and break
+			new_monst = free_monsters[randint(0, len(free_monsters))]
+			monsters[new_monst]['x'] = x
+			monsters[new_monst]['y'] = y
+			active_monsters.append(new_monst)
+			break
+		# else loop again
+		
+	# when monster has spawned, return updated lists
+	return {'monsters':monsters, 'active_monsters':active_monsters}
+
 actions = {
     'rotate_right': rotate_right,
     'rotate_left': rotate_left,
@@ -186,6 +217,7 @@ class action(webapp.RequestHandler):
         world = json.loads(game.tiles)
 
         monsters = json.loads(game.monsters)
+        active_monsters = json.loads(game.active_monsters)
         powerups = json.loads(game.powerups)
 
         player = json.loads(game.player)
@@ -236,17 +268,15 @@ class action(webapp.RequestHandler):
         m_grid = monster_changes['m_grid']
         #calculate damage
         player = calc_damage(player, monster_changes['prox_count'])
-        
+                
         # board updates!
         # tile randomising (non-vital)
         # monster spawning
-        # powerup drops        
-        # move monsters & calculate damage
-        # loop through monsters, check for proximity to player
+        if game.turn_count % 5 == 0:
+			spawn_results = spawn_monster(monsters, active_monsters, player, m_grid)
+			monsters = spawn_results['monsters']
+			active_monsters = spawn_results['active_monsters']
         
-        # board updates!
-        # tile randomising (non-vital)
-        # monster spawning
         # powerup drops
         
         # save the changed world
@@ -257,6 +287,8 @@ class action(webapp.RequestHandler):
         #game.powerups = json.dumps(powerups)
         # save the updated health
         game.player = json.dumps(player)
+        
+        game.turn_count+=1
         
         game.put()
 

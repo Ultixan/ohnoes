@@ -56,6 +56,7 @@ def get_game(game_id):
         game.monsters = json.dumps(monsters)
         game.powerups = json.dumps(powerups)
         game.game_id = game_id
+        game.turn_count = 0
         game.put()
     else:
         game = game[0]
