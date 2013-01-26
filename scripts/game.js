@@ -81,6 +81,25 @@ var performAction = function(params) {
     );
 };
 
+var audio = $('audio');
+var playBeat = function() {
+    audio[0].load();
+//    audio[0].play();
+};
+var beat2 = function() {
+    playBeat();
+    manageBeat();
+};
+var beat1 = function() {
+    playBeat();
+    setTimeout(beat2, 200);
+};
+var manageBeat = function() {
+    var time = 60000 / (player.heartrate / 2) - 200;
+    time = time < 400 ? 400 : time;
+    setTimeout(beat1, time);
+};
+
 $(document).ready(function() {
     $('td.tile', 'table.grid').mouseover(function(ev) {
         if (state === 'targeting') {
@@ -119,4 +138,5 @@ $(document).ready(function() {
         ev.stopPropagation();
     });
     updatePlayer(player);
+    manageBeat();
 });
