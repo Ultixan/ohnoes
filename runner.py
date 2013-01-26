@@ -6,6 +6,7 @@ from constants import directions
 from constants import column_range
 from constants import max_beats
 from constants import monster_spawn_rate
+from constants import ability_codes
 from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
