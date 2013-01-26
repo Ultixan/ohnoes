@@ -202,6 +202,36 @@ $(document).ready(function() {
             target.detach();
         }
     });
+    $('body').keypress(function(ev) {
+        switch(ev.keyCode){
+        case 113:
+        case 81:
+            state = 'targeting';
+            action = 'rotate_left';
+            target.removeClass('rotate_right rotate_left');
+            target.addClass('rotate_left');
+            break
+        case 119:
+        case 87:
+            state = 'targeting';
+            action = 'rotate_right';
+            target.removeClass('rotate_right rotate_left');
+            target.addClass('rotate_right');
+            break;
+        case 101:
+        case 69:
+            state = 'targeting';
+            action = 'swap_tiles';
+            target.addClass('swap_tiles');
+            break;
+        case 114:
+        case 82:
+            state = 'targeting';
+            action = 'shift_tiles';
+            target.addClass('shift_tiles');
+            break;
+        }
+    });
     tiles.click(function(ev) {
         console.log(action);
         if (action === 'rotate_left' || action === 'rotate_right') {
