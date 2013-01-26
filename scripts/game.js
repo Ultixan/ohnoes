@@ -134,8 +134,8 @@ var performAction = function(params) {
 
 var audio = $('audio');
 var playBeat = function() {
-//    audio[0].load();
-//    audio[0].play();
+    audio[0].load();
+    audio[0].play();
 };
 function choice(arr){
     var c = arr.length;
