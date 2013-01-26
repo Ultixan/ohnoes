@@ -19,27 +19,27 @@ def authorize(scope):
     return user
 
 def end_game_redirect(game):
-	world = json.loads(game.tiles)
+    world = json.loads(game.tiles)
     #monsters = json.loads(game.monsters)
     #active_monsters = json.loads(game.active_monsters)
     #powerups = json.loads(game.powerups)
     player = json.loads(game.player)
-	
-	# LALALA DEATH SCREEEEN
-	# fetch needed endscreen data
-	turns_lasted = game.turn_count
-	last_heartrate = player['heartrate']
-	last_heartbeats = player['heartbeats']
-	monsters = game.monsters
-	active_monsters = game.active_monsters
-	
-	# clean up game
-	clean_up_game(game)
-	
-	path = template_path('results.html')
-	
-	# send end of game data to redirect
-	self.response.out.write(
+    
+    # LALALA DEATH SCREEEEN
+    # fetch needed endscreen data
+    turns_lasted = game.turn_count
+    last_heartrate = player['heartrate']
+    last_heartbeats = player['heartbeats']
+    monsters = game.monsters
+    active_monsters = game.active_monsters
+    
+    # clean up game
+    clean_up_game(game)
+    
+    path = template_path('results.html')
+    
+    # send end of game data to redirect
+    self.response.out.write(
             template.render(self.path, {
                 'heartrate': last_heartrate,
                 'heartbeat': last_heartbeat,
@@ -48,26 +48,26 @@ def end_game_redirect(game):
                 'turns': turns_lasted
             })
         )
-	
+    
 def clean_up_game(game):
-	# get stuff
+    # get stuff
     active_monsters = json.loads(game.active_monsters)
     powerups = json.loads(game.powerups)
     player = json.loads(game.player)
-	
-	player['heartrate'] = 50	# reset heartrate
-	player['heartbeats'] = 1000	# reset heartbeats
-	active_monsters = []		# reset active monsters
-	powerups = [] 				# clear all powerups
-	for a in player['abilities']:			# reset timedown on abilities
-		a = 0
-	
-	game.active_monsters = json.dumps(active_monsters)
-	game.powerups = json.dumps(powerups)
-	game.player = json.dumps(player)
-	
-	# save stuff
-	game.put()
+    
+    player['heartrate'] = 50    # reset heartrate
+    player['heartbeats'] = 1000 # reset heartbeats
+    active_monsters = []        # reset active monsters
+    powerups = []               # clear all powerups
+    for a in player['abilities']:           # reset timedown on abilities
+        a = 0
+    
+    game.active_monsters = json.dumps(active_monsters)
+    game.powerups = json.dumps(powerups)
+    game.player = json.dumps(player)
+    
+    # save stuff
+    game.put()
 
 class display_game(webapp.RequestHandler):
     path = template_path('game.html')
@@ -82,7 +82,7 @@ class display_game(webapp.RequestHandler):
         
         # check for death condition
         if game.is_dead == 1:
-			end_game_redirect(game)
+            end_game_redirect(game)
         
         tiles = []
         for row in json.loads(game.tiles):
@@ -339,7 +339,7 @@ class action(webapp.RequestHandler):
             m_grid.append(row)
         for a in active_monsters:
             m = monsters[a]
-=           m_grid[m['y']][m['x']] = m  
+            m_grid[m['y']][m['x']] = m  
         # move monsters 
         monster_changes = move_monsters(world, monsters, player, m_grid, active_monsters)
         monsters = monster_changes['monsters']
@@ -361,8 +361,8 @@ class action(webapp.RequestHandler):
         # check death conditions
         # no more heartbeats
         if player['heartbeats'] <= 0 or  player['heartrate'] >= 200 or monster_changes['prox_count']['gruesome_death']>0:
-			game.is_dead = 1
-			changes['is_dead'] = True
+            game.is_dead = 1
+            changes['is_dead'] = True
         
         # save the changed world
         game.tiles = json.dumps(world)
