@@ -176,3 +176,15 @@ span.boogey {
 span.stove {
   background-image: url('/images/stove.png');
 }
+#target.up_cursor {
+  cursor: n-resize;
+}
+#target.down_cursor {
+  cursor: s-resize;
+}
+#target.left_cursor {
+  cursor: w-resize;
+}
+#target.right_cursor {
+  cursor: e-resize;
+}

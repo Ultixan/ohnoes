@@ -1,5 +1,6 @@
 var state = 'waiting';
 var action = null;
+var direction = null;
 var shifters = $('table.grid td.shifter');
 var target = $('<div id="target"/>');
 var tiles = $('table.grid td.tile');
@@ -139,6 +140,32 @@ $(document).ready(function() {
             $(ev.currentTarget).append(target);
         }
     });
+    $('td.tile', 'table.grid').mousemove(function(ev) {
+        if (state === 'targeting') {
+            target.removeClass('up_cursor down_cursor left_cursor right_cursor horizontal_cursor vertical_cursor');
+            if(action === 'shift_tiles' || action === 'swap_tiles'){
+                // Do stuff based on the offsetX and offsetY
+                if(ev.offsetX>ev.offsetY)
+                    if(64-ev.offsetX>ev.offsetY) {
+                        target.addClass('up_cursor');
+                        direction = 'up';
+                    }
+                    else {
+                        target.addClass('right_cursor');
+                        direction = 'right';
+                    }
+                else
+                    if(64-ev.offsetX>ev.offsetY) {
+                        target.addClass('left_cursor');
+                        direction = 'left';
+                    }
+                    else {
+                        target.addClass('down_cursor');
+                        direction = 'down';
+                    }
+            }
+        }
+    });
     var rotateFn = function(name) {
         return function(ev) {
             state = 'targeting';
@@ -148,8 +175,26 @@ $(document).ready(function() {
             ev.stopPropagation();
         };
     };
+    var swap_tiles = function() {
+        return function(ev) {
+            state = 'targeting';
+            action = 'swap_tiles';
+            target.addClass('swap_tiles');
+            ev.stopPropagation();
+         };
+    };
+    var shift_tiles = function(){
+        return function(ev) {
+            state = 'targeting';
+            action = 'shift_tiles';
+            target.addClass('shift_tiles');
+            ev.stopPropagation();
+         };
+    };
     $('#rotate_right').click(rotateFn('rotate_right'));
     $('#rotate_left').click(rotateFn('rotate_left'));
+    $('#swap_tiles').click(swap_tiles());
+    $('#shift_tiles').click(shift_tiles());
     $('body').click(function(ev) {
         if (state !== 'waiting') {
             action = null;
@@ -158,6 +203,7 @@ $(document).ready(function() {
         }
     });
     tiles.click(function(ev) {
+        console.log(action);
         if (action === 'rotate_left' || action === 'rotate_right') {
             var tile = $(ev.currentTarget);
             var x = tile.prevAll().length - 1;
@@ -166,6 +212,17 @@ $(document).ready(function() {
             target.detach();
             performAction({action: action, x: x, y: y});
             action = null;
+            state = 'waiting';
+        }
+        else if (action === 'swap_tiles'|| action === 'shift_tiles') {
+            var tile = $(ev.currentTarget);
+            var x = tile.prevAll().length - 1;
+            var y = tile.parent().prevAll().length -1;
+            target.removeClass('up_cursor down_cursor left_cursor right_cursor horizontal_cursor vertical_cursor');
+            target.detach();
+            performAction({action: action, x: x, y: y,direction:direction});
+            action = null;
+            direction = null;
             state = 'waiting';
         }
         ev.stopPropagation();

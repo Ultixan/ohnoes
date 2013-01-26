@@ -125,48 +125,52 @@ def calc_damage(player, prox_count):
 def shift_tiles(world, monsters, player, params):
     #Get the direction. If it's left or right, x++ for all x in world[params[y]]
     #If it's top or bottom, y++ for all y in world[params[x]]
+    x=params['x']
+    y=params['y']
     direction=params['direction']
-    changes=[]
+    changes={'world':[]}
 
     if direction == "left":
         for i in range(10):
-            changes.append({'change_type':'world','change':{'x':i,'y':params['y'],'direction':world[params['y']][params[(i-1)%10]]}})
+            changes['world'].append({'x':i,'y':y,'direction':world[y][(i-1)%10]})
     elif direction == "right":
         for i in range(10):
-            changes.append({'change_type':'world','change':{'x':i,'y':params['y'],'direction':world[params['y']][params[(i+1)%10]]}})
+            changes['world'].append({'x':i,'y':y,'direction':world[y][(i+1)%10]})
     elif direction == "up":
         for i in range(10):
-            changes.append({'change_type':'world','change':{'x':params['x'],'y':i,'direction':world[params[(i-1)%10]][params['x']]}})
+            changes['world'].append({'x':x,'y':i,'direction':world[(i-1)%10][x]})
     elif direction == "down": 
         for i in range(10):
-            changes.append({'change_type':'world','change':{'x':params['x'],'y':i,'direction':world[params[(i+1)%10]][params['x']]}})
+            changes['world'].append({'x':x,'y':i,'direction':world[(i+1)%10][x]})
     
     return changes
 
 def swap_tiles(world, monsters, player, params):
+    x=params['x']
+    y=params['y']
     direction=params['direction']
 
     # We have two tiles changing: Which two depends on the direction. Set both of them to x and y in the meantime 
-    changes=[]
-    changes.append({'change_type':'world','change':{'x':params['x'],'y':params['y'],'direction':world[params['y']][params['x']]}})
-    changes.append({'change_type':'world','change':{'x':params['x'],'y':params['y'],'direction':world[params['y']][params['x']]}})
+    changes={'world':[]}
+    changes['world'].append({'x':x,'y':y,'direction':world[y][x]})
+    changes['world'].append({'x':x,'y':y,'direction':world[y][x]})
 
     if direction == 'left':
-        changes[0]['change']['direction']=world[params['y']][(params['x']-1)%10]
-        changes[1]['change']['x']-=1
-        changes[1]['change']['x']%=10
+        changes['world'][0]['direction']=world[y][(x-1)%10]
+        changes['world'][1]['x']-=1
+        changes['world'][1]['x']%=10
     elif direction == 'right':
-        changes[0]['change']['direction']=world[params['y']][(params['x']+1)%10]
-        changes[1]['change']['x']+=1
-        changes[1]['change']['x']%=10
+        changes['world'][0]['direction']=world[y][(x+1)%10]
+        changes['world'][1]['x']+=1
+        changes['world'][1]['x']%=10
     elif direction == 'top':
-        changes[0]['change']['direction']=world[(params['y']-1)%10][params['x']]
-        changes[1]['change']['y']-=1
-        changes[1]['change']['y']%=10
+        changes['world'][0]['direction']=world[(y-1)%10][x]
+        changes['world'][1]['y']-=1
+        changes['world'][1]['y']%=10
     elif direction == 'bottom':
-        changes[0]['change']['direction']=world[(params['y']+1)%10][params['x']]
-        changes[1]['change']['y']+=1
-        changes[1]['change']['y']%=10
+        changes['world'][0]['direction']=world[(y+1)%10][x]
+        changes['world'][1]['y']+=1
+        changes['world'][1]['y']%=10
     
     return changes
 
