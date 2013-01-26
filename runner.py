@@ -62,16 +62,16 @@ actions = {
 }
 
 class action(webapp.RequestHandler):
-	def move_pos(self, move_code, coords):	
-		if move_code == 0:
-			coords['y'] = (coords['y']-1)%10
-		elif move_code == 1:
-			coords['x'] = (coords['x']+1)%10
-		elif move_code == 2:
-			coords['y'] = (coords['y']+1)%10
-		elif move_code == 3:
-			coords['x'] = (coords['x']-1)%10
-		return coords;
+    def move_pos(self, move_code, coords):  
+        if move_code == 0:
+            coords['y'] = (coords['y']-1)%10
+        elif move_code == 1:
+            coords['x'] = (coords['x']+1)%10
+        elif move_code == 2:
+            coords['y'] = (coords['y']+1)%10
+        elif move_code == 3:
+            coords['x'] = (coords['x']-1)%10
+        return coords;
         
     def shift_tiles(self, world, monsters, player, params):
         #Get the direction. If it's left or right, x++ for all x in world[params[y]]
