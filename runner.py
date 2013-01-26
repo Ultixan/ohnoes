@@ -91,8 +91,8 @@ class action(webapp.RequestHandler):
         # get world state (from user)
         game = get_game(get_account(user).game_id)
         world = json.loads(game.tiles)
-        monsters = json.loads(game.monsters)
-        powerups = json.loads(game.powerups)
+        monsters = json.loads(game.monsters or [])
+        powerups = json.loads(game.powerups or [])
         player = json.loads(game.player)
         
         # get action params from POST
