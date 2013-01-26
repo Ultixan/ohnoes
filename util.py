@@ -48,7 +48,12 @@ def get_game(game_id):
         player['heartbeats']=1000
         player['x']=5
         player['y']=5
-        player['objects']=[]
+        player['abilities']={
+        'rotate_right':0,
+        'rotate_left':0,
+        'shift_tiles':0,
+        'swap_tiles':0
+        }
         game[0].player = json.dumps(player)
         game[0].game_id = game_id
         game[0].put()

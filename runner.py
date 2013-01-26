@@ -49,7 +49,8 @@ class action(webapp.RequestHandler):
         world[params[y]][params[x]] -= 1
         world[params[y]][params[x]] %= 4 # to wrap direction around to 0
         
-        # NB @TODO update actual stored world file??
+        player['abilities']['rotate_left'] = 2
+        
         return {'change_type':'world', change:{'x':params[x], 'y':params[y], 'direction':world[params[y]][params[x]]}}
     
     # takes world json and tile coords, transforms, returns new version
@@ -60,7 +61,8 @@ class action(webapp.RequestHandler):
         world[params[y]][params[x]] += 1
         world[params[y]][params[x]] %= 4 # to wrap direction around to 0
         
-        # NB @TODO update actual stored world file??
+        player['abilities']['rotate_left'] = 2
+        
         return [{'change_type':'world', 'change':{'x':params[x], 'y':params[y], 'direction':world[params[y]][params[x]]}}]
 
     actions = {
@@ -68,22 +70,42 @@ class action(webapp.RequestHandler):
         'rotate_left': rotate_left
     }
 
-    def move(self, move_code, coords):
-        if move_code == 0:
-            coords['y'] = (coords[y]-1)%10
-        elif move_code == 1:
-            coords['x'] = (coords[x]+1)%10
-        elif move_code == 2:
-            coords['y'] = (coords[y]+1)%10
-        elif move_code == 2:
-            coords['x'] = (coords[x]-1)%10
-        return coords;
+	def move_pos(self, move_code, coords):	
+		if move_code == 0:
+			coords['y'] = (coords['y']-1)%10
+		elif move_code == 1:
+			coords['x'] = (coords['x']+1)%10
+		elif move_code == 2:
+			coords['y'] = (coords['y']+1)%10
+		elif move_code == 3:
+			coords['x'] = (coords['x']-1)%10
+		return coords;
         
-    def move_player(self, world, player, powerups):
-        # check direction of tile
-        move_code = world[player['y']][player['x']]
-        
-        
+    def move_player(self, world, player):
+		# check direction of tile
+		move_code = world[player['y']][player['x']]
+		# move player
+		new_pos = move_pos(move_code, {'x':player['x'], 'y':player['y']})
+		player['x'] = new_pos['x']
+		player['y'] = new_pos['y']
+		
+		return player	
+		
+	def move_monsters(self, world, monsters, player):
+		prox_count = {'near':0, 'superclose':0}
+		for m in monsters:
+			# check direction of tile
+			move_code = world[m['y']][m['x']]
+			# move monster
+			new_pos = move_pos(move_code, {'x':m['x'], 'y':m['y']})
+			m['x'] = new_pos['x']
+			m['y'] = new_pos['y']
+		
+			# calculate proximity
+			#if m['x']-player['x']<2 ||
+			
+		return {'prox_count' : prox_count, 'monsters' : monsters}
+		
     def post(self):
         # authenticate user
         user = authorize(self)
@@ -95,6 +117,13 @@ class action(webapp.RequestHandler):
         powerups = json.loads(game.powerups)
         player = json.loads(game.player)
         
+        # FIRST update allowed actions (i.e. a turn has passed for them)
+        for a in player['abilities']:
+			if a > 0:
+				a -= 1
+		#@TODO update countdown on powerups on board
+		
+        # THEN perform new action && make it invalid
         # get action params from POST
         params_json = self.request.body;
         # get action key
@@ -105,26 +134,34 @@ class action(webapp.RequestHandler):
         
         # loop through changes and apply
         for c in changes:
-            if c['change_type'] == 'world':
-                x = c['change']['x']
-                y = c['change']['y']
-                direction = c['change']['direction']
-                world[y][x] = direction
-            elif c['change_type'] == 'monsters':
-                continue #@TODO
-            elif c['change_type'] == 'player':
-                continue #@TODO
-        
-        # move player & pick up any powerups
-        move_player(world, player, powerups)
-        # move monsters & calculate damage
-        # loop through monsters, check for proximity to player
-        
-        # board updates!
-        # tile randomising (non-vital)
-        # monster spawning
-        # powerup drops
-        
+			if c['change_type'] == 'world':
+				x = c['change']['x']
+				y = c['change']['y']
+				direction = c['change']['direction']
+				world[y][x] = direction
+			elif c['change_type'] == 'monsters':
+				continue #@TODO
+			elif c['change_type'] == 'player':
+				continue #@TODO
+		
+		# move player
+		player = move_player(world, player)
+		# check for powerups
+		new_powerups = []
+		for p in powerups:
+			if (p['x'] == player['x'] && p['y'] == player['y']): # if there is a powerup on the square
+				player['abilities'][p['name']] = 0	# pick it up
+			else
+				new_powerups.append(p)
+		powerups = new_powerups
+				
+		# move monsters & calculate damage
+		# loop through monsters, check for proximity to player
+		
+		# board updates!
+		# tile randomising (non-vital)
+		# monster spawning
+		# powerup drops        
         
         # save the changed world
         game.tiles = json.dumps(world)
