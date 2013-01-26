@@ -228,5 +228,6 @@ $(document).ready(function() {
         ev.stopPropagation();
     });
     updatePlayer(player);
+    updateMonsters(starting_monsters);
     manageBeat();
 });

@@ -13,6 +13,14 @@
         x: {{ player.x }},
         y: {{ player.y }}
       };
+      var starting_monsters = {
+      {% for m in monsters %}
+        {{m.name}}: {
+          x: {{m.x}},
+          y: {{m.y}}
+        },
+      {% endfor %}
+      };
     </script>
   </head>
   <body>

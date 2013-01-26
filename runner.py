@@ -34,12 +34,22 @@ class display_game(webapp.RequestHandler):
             for cell in row:
                 newRow.append(directions[cell])
             tiles.append(newRow)
+        monsters = json.loads(game.monsters)
+        monster_details = []
+        for monster in json.loads(game.active_monsters):
+            m = monsters[monster]
+            monster_details.append({
+                'name': monster,
+                'x': m['x'],
+                'y': m['y']
+            })
         self.response.out.write(
             template.render(self.path, {
                 'tiles': tiles,
                 'columns': column_range,
                 'player': json.loads(game.player),
-                'max_beats': max_beats
+                'max_beats': max_beats,
+                'monsters': monster_details
             })
         )
 
