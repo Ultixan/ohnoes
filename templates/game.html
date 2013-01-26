@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <title>Oh Noes!</title>
+    <script src="scripts/jq.js" type="javascript"></script>
+    <link rel="stylesheet" href="styles/common.css"/>
+    <link rel="stylesheet" href="styles/game.css"/>
+  </head>
+  <body>
+    <table class="grid">
+    {% for row in tiles %}
+      <tr>
+      {% for cell in row %}
+        <td class="tile {{cell}}"></td>
+      {% endfor %}
+      </tr>
+    {% endfor %}
+    </table>
+  </body>
+</html>

@@ -1,25 +1,38 @@
 import cgi
 import json
 
+from constants import directions
 from google.appengine.api import users
-from google.appengine.ext import db
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 from util import template_path
+from util import get_game
+
+def authorize(scope):
+    user = users.get_current_user()
+    if not user:
+        return scope.redirect(
+            users.create_login_url(scope.request.uri)
+        )
+    
 
 class display_game(webapp.RequestHandler):
-    path = template_path('index.html')
+    path = template_path('game.html')
 
     def get(self):
-        grid = []
-        row = []
-        for j in range(0, 10):
-            row.append('')
-        for i in range(0, 10):
-            grid.append(row)
+        authorize(self)
+        game = get_game('bar')
+        tiles = []
+        for row in json.loads(game.tiles):
+            newRow = []
+            for cell in row:
+                newRow.append(directions[cell])
+            tiles.append(newRow)
         self.response.out.write(
-            template.render(self.path, {'grid': grid})
+            template.render(self.path, {
+                'tiles': tiles
+            })
         )
 
 urls = [

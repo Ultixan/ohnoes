@@ -8,10 +8,28 @@ table.grid {
 table.grid td {
   height: 64px;
   width: 64px;
-  background: #DEDEDE;
+  background-color: #DEDEDE;
+  padding: 0;
+  margin: 0;
 }
 
 table.grid tr:nth-child(odd) td:nth-child(even), 
 table.grid tr:nth-child(even) td:nth-child(odd) {
-  background: #C7C7C7;
+  background-color: #C7C7C7;
+}
+
+td.tile.up {
+  background-image: url('/images/tile_feet3.png');
+}
+
+td.tile.right {
+  background-image: url('/images/Tile_feet1.png');
+}
+
+td.tile.down {
+  background-image: url('/images/tile_feet7.png');
+}
+
+td.tile.left {
+  background-image: url('/images/tile_feet5.png');
 }
