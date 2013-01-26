@@ -12,6 +12,7 @@ table.grid td.tile {
   padding: 0;
   margin: 0;
   position: relative;
+  background-image: url('/images/feet.png');
 }
 
 table.grid tr:nth-child(odd) td.tile:nth-child(even), 
@@ -30,19 +31,23 @@ table.grid td.shifter.bottom {
 }
 
 td.tile.up {
-  background-image: url('/images/tile_feet3.png');
+  background-position: 0px 0px;
 }
 
 td.tile.right {
-  background-image: url('/images/Tile_feet1.png');
+  background-position: 0px 128px;
 }
 
 td.tile.down {
-  background-image: url('/images/tile_feet7.png');
+  background-position: 0 64px;
 }
 
 td.tile.left {
-  background-image: url('/images/tile_feet5.png');
+  background-position: 0 192px;
+}
+
+table.grid td.tile.active {
+  background-image: url('/images/active_feet.png');
 }
 
 #actions {
@@ -70,11 +75,19 @@ td.tile.left {
   background-image: url('/images/rotate_right.png');
 }
 
+#shift_tiles {
+  background-image: url('/images/shift.png');
+}
+
+#swap_tiles {
+ background-image: url('/images/swap.png');
+}
+
 #heart_monitor {
   position: absolute;
   top: 20px;
   right: 20px;
-  width: 50px;
+  width: 64px;
   height: 300px;
 }
 
@@ -83,12 +96,19 @@ td.tile.left {
   height: 200px;
   background: red;
   border: 2px solid yellow;
+  margin: 0 auto;
 }
 
 #bar {
   width: 100%;
   height: 0%;
   background: black;
+}
+
+#heart {
+  width: 64px;
+  height: 64px;
+  background-image: url('/images/heart.png');
 }
 
 #player {

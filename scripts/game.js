@@ -4,7 +4,7 @@ var state = 'waiting';
 var action = null;
 var shifters = $('table.grid td.shifter');
 var target = $('<div id="target"/>');
-var tiles = $('table.grid td.tiles');
+var tiles = $('table.grid td.tile');
 
 var world = {
   player: {
@@ -65,6 +65,19 @@ var updatePlayer = function(player) {
     //Update heartrate
 };
 
+var handleUpdate = function(req, rsp) {
+    console.log(req);
+    console.log(rsp);
+};
+
+var performAction = function(params) {
+    $.post(
+        'action',
+        JSON.stringify(params),
+        handleUpdate
+    );
+};
+
 $(document).ready(function() {
     $('td.tile', 'table.grid').mouseover(function(ev) {
         if (state === 'targeting') {
@@ -90,7 +103,16 @@ $(document).ready(function() {
         }
     });
     tiles.click(function(ev) {
-        target.removeClass('rotate_right', 'rotate_left');
+        if (action === 'rotate_left' || action === 'rotate_right') {
+            var tile = $(ev.currentTarget);
+            var x = tile.prevAll().length - 1;
+            var y = tile.parent().prevAll().length - 1;
+            target.removeClass('rotate_right rotate_left');
+            target.detach();
+            performAction({action: action, x: x, y: y});
+            action = null;
+            state = 'waiting';
+        }
         ev.stopPropagation();
     });
 });
