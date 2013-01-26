@@ -127,13 +127,15 @@ def rotate(world, mosters, player, params, tick):
     y = params['y']
     direction = (world[y][x] + tick) % 4
     
+    ability_type = 'rotate_right' if tick>0 else 'rotate_left'
+    
     return {
         'world': [{
             'x': x,
             'y': y,
             'direction': direction
         }],
-        'player': {'ability_used':'swap_tiles'}
+        'player': {'ability_used':ability_type}
         }
 def rotate_left(world, monsters, player, params):
     return rotate(world, monsters, player, params, -1)
@@ -305,9 +307,9 @@ class action(webapp.RequestHandler):
         player = json.loads(game.player)
         
         # FIRST update allowed actions (i.e. a turn has passed for them)
-        for a in player['abilities']:
-            if a > 0:
-                a -= 1
+        for i in range(len(player['abilities'])):
+            if player['abilities'][i] > 0:
+                player['abilities'][i] -= 1
         # update countdown on powerups
         
         # THEN perform new action && make it invalid
