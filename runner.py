@@ -229,11 +229,11 @@ def swap_tiles(world, monsters, player, params):
         changes['world'][0]['direction']=world[y][(x+1)%10]
         changes['world'][1]['x']+=1
         changes['world'][1]['x']%=10
-    elif direction == 'top':
+    elif direction == 'up':
         changes['world'][0]['direction']=world[(y-1)%10][x]
         changes['world'][1]['y']-=1
         changes['world'][1]['y']%=10
-    elif direction == 'bottom':
+    elif direction == 'down':
         changes['world'][0]['direction']=world[(y+1)%10][x]
         changes['world'][1]['y']+=1
         changes['world'][1]['y']%=10
