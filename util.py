@@ -21,8 +21,8 @@ def get_account(user):
     if existing.count() == 0:
         account = Account()
         account.user = user
-		import uuid
-		account.game_id=uuid.uuid4()
+        import uuid
+        account.game_id=uuid.uuid4()
         account.put()
         return account
     else:

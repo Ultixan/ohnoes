@@ -24,7 +24,7 @@ class display_game(webapp.RequestHandler):
 
     def get(self):
         user = authorize(self)
-		account = get_account(user)
+        account = get_account(user)
         game = get_game(account.game_id)
         tiles = []
         for row in json.loads(game.tiles):
