@@ -197,6 +197,18 @@ span.snake {
   background-image: url('/images/snake.png');
 }
 
+span.octo {
+  background-image: url('/images/octopus.png');
+}
+
+span.lighter {
+  background-image: url('/images/lighter.png');
+}
+
+span.shark {
+  background-image: url('/images/shark.png');
+}
+
 #target.up_cursor {
   cursor: n-resize;
 }
