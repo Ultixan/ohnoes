@@ -1,33 +1,8 @@
-var MAX_BEATS = 1000;
-
 var state = 'waiting';
 var action = null;
 var shifters = $('table.grid td.shifter');
 var target = $('<div id="target"/>');
 var tiles = $('table.grid td.tile');
-
-var world = {
-  player: {
-    element: $('<span id="player"/>'),
-    heartBeats: 400,
-    heartRate: 80,
-    x: 0,
-    y: 0,
-    abilities: {
-      turnLeft: true,
-      turnRight: true,
-      shiftTiles: true,
-      swapTiles: true,
-      blankie: false,
-      bear: false,
-      light: false,
-      rattle: false,
-      pacifier: false,
-      duckie: false
-    }
-  }
-};
-
 
 var getTileElement = function(x, y) {
     var row = $('table.grid tr:nth-child(' + (y + 2) + ')');
@@ -48,26 +23,53 @@ var updateTiles = (function() {
   };
 })();
 
-var updatePlayer = function(player) {
+var updatePlayer = function(pdata) {
+    player.x = pdata.x;
+    player.y = pdata.y;
+    player.heartbeats = pdata.heartbeats;
+    player.heartrate = pdata.heartrate;
     //Update position
     var tile = getTileElement(player.x, player.y);
-    tile.append(world.player.element);
+    tile.append(player.element);
 
     //Update abilities
 
     //Update heartbeats
-    var percent = (world.player.heartBeats  * 100 / MAX_BEATS);
+    var percent = (player.heartbeats  * 100 / MAX_BEATS);
     $('#bar').css(
         'height', 
         100 - percent + '%'
     );
 
     //Update heartrate
+
+    //Update active tiles
+    tiles.removeClass('active current');
+    var curTile = tile;
+    var x = player.x;
+    var y = player.y;
+    curTile.addClass('current');
+    for (var i=0; i < 3; i++) {
+        if (curTile.hasClass('up')) {
+            y = (y - 1) % 10;
+        } else if (curTile.hasClass('right')) {
+            x = (x + 1) % 10;
+        } else if (curTile.hasClass('down')) {
+            y = (y + 1) % 10;
+        } else {
+            x = (x - 1) % 10;
+        }
+        curTile = getTileElement(x, y);
+        curTile.addClass('active');
+    }
 };
 
 var handleUpdate = function(rsp) {
     if (rsp.hasOwnProperty('world')) {
         updateTiles(rsp.world);
+    }
+    if (rsp.hasOwnProperty('player')) {
+        updatePlayer(rsp.player);
     }
 };
 
@@ -116,4 +118,5 @@ $(document).ready(function() {
         }
         ev.stopPropagation();
     });
+    updatePlayer(player);
 });

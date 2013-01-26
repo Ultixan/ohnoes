@@ -50,6 +50,10 @@ table.grid td.tile.active {
   background-image: url('/images/active_feet.png');
 }
 
+table.grid td.tile.current {
+  background-image: url('/images/current_feet.png');
+}
+
 #actions {
     position: absolute;
     top: 0;

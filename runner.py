@@ -4,6 +4,7 @@ import logging
 
 from constants import directions
 from constants import column_range
+from constants import max_beats
 from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
@@ -35,7 +36,9 @@ class display_game(webapp.RequestHandler):
         self.response.out.write(
             template.render(self.path, {
                 'tiles': tiles,
-                'columns': column_range
+                'columns': column_range,
+                'player': json.loads(game.player),
+                'max_beats': max_beats
             })
         )
 
@@ -256,6 +259,8 @@ class action(webapp.RequestHandler):
         game.player = json.dumps(player)
         
         game.put()
+
+        changes['player'] = player
         
         # response: send changes!
         self.response.headers['Content-Type'] = "application/json"
