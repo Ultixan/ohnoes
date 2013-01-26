@@ -15,13 +15,13 @@ def authorize(scope):
         return scope.redirect(
             users.create_login_url(scope.request.uri)
         )
-    
+    return user
 
 class display_game(webapp.RequestHandler):
     path = template_path('game.html')
 
     def get(self):
-        authorize(self)
+        user = authorize(self)
         game = get_game('bar')
         tiles = []
         for row in json.loads(game.tiles):
@@ -34,6 +34,34 @@ class display_game(webapp.RequestHandler):
                 'tiles': tiles
             })
         )
+
+class action():
+	actions = {
+		"rotate_right" : rotate_right,
+		"rotate_left" : rotate_left
+	}
+	
+	def post(self):
+		# authenticate user
+		user = authorize(self)
+		# get world state (from user)
+		world_json = get_game(get_account(user).game_id).tiles
+		
+		#get action params from POST
+		params_json = self.request.body;
+		# get action key
+		action_key = json.loads(params_json)["action"]
+		# perform action on the world
+		new_world_json = actions[action_key](world_json, params_json)	
+	
+	# takes world json and tile coords, transforms, returns new version
+	def rotate_left(self, world_json, params_json):
+		world_state = json.loads(world_json)
+		
+		
+		
+		
+		
 
 urls = [
   ('/', display_game)
