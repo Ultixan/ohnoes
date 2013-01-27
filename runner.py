@@ -36,6 +36,7 @@ class results(webapp.RequestHandler):
 
         if game.is_dead != 1:
             self.redirect('/')
+            return
 
         player = json.loads(game.player)
         turns_lasted = game.turn_count

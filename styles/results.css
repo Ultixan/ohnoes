@@ -31,3 +31,9 @@
 #image.headon {
   background-image: url('/images/creepymonster.png');
 }
+
+#monster_hook {
+  display: inline-block;
+  position: static;
+  vertical-align: middle;
+}

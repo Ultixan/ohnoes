@@ -174,64 +174,6 @@ table.grid td.tile.current {
   cursor: url('/images/rotate_right_sm.png'), pointer;
 }
 
-span.monster {
-  margin: auto auto;
-  height: 50px;
-  width: 50px;
-  display: inline-block;
-  position: absolute;
-  top: 10%;
-  left: 10%;
-}
-
-span.flame {
-  background-image: url('/images/Flame.png');
-}
-
-span.ghost {
-  background-image: url('/images/ghost.png');
-}
-
-span.boogey {
-  background-image: url('/images/boogeyman.png');
-}
-
-span.stove {
-  background-image: url('/images/stove.png');
-}
-
-span.orb {
-  background-image: url('/images/Darkness.png');
-}
-
-span.rat {
-  background-image: url('/images/rat.png');
-}
-
-span.spider {
-  background-image: url('/images/Spider.png');
-}
-
-span.jelly {
-  background-image: url('/images/jellyfish.png');
-}
-
-span.snake {
-  background-image: url('/images/snake.png');
-}
-
-span.octo {
-  background-image: url('/images/octopus.png');
-}
-
-span.lighter {
-  background-image: url('/images/lighter.png');
-}
-
-span.shark {
-  background-image: url('/images/shark.png');
-}
-
 #target.up_cursor {
   cursor: n-resize;
 }

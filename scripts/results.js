@@ -15,7 +15,7 @@ $(document).ready(function() {
         }
     };
     if (monster) {
-        $('#monster_hook').text(monster);
+        $('#monster_hook').addClass(monster);
         target = 'killed';
     } else if (heartrate < 200 && heartbeat <= 0) {
         target = 'survivor';

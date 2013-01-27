@@ -11,15 +11,19 @@ elements = {
 	'ghost' : 'dark',
 	'orb'	: 'dark',
 	'boogey': 'dark',
+    'bat' : 'dark',
 	'stove'	: 'fire',
 	'lighter' : 'fire',
 	'flame' : 'fire',
+    'firefly' : 'firefly',
 	'jelly' : 'water',
 	'shark' : 'water',
 	'octo'	: 'water',
+    'toilet' : 'water',
 	'spider': 'crawlies',
 	'rat'	: 'crawlies',
-	'snake' : 'crawlies'
+	'snake' : 'crawlies',
+    'mantis' : 'crawlies'
 }
 
 ability_codes = {
