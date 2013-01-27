@@ -151,7 +151,7 @@ var replay_audio = function() {
         document.getElementById(id).load();
         document.getElementById(id).play();
 };
-var choose_glitch = function() {
+var choose_glitch = function(arr) {
     if(choice([1,2,3])==1){
         var id='glitch'+choice(['1','2','3']);
         document.getElementById(id).load();
@@ -159,7 +159,7 @@ var choose_glitch = function() {
     }
     else
     {
-        var id='soundtrack'+choice(['1','2','3']);
+        var id='soundtrack'+choice(arr);
         document.getElementById(id).load();
         document.getElementById(id).play();
     }
