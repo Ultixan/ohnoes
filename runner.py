@@ -203,6 +203,7 @@ class action(webapp.RequestHandler):
         
         # calculate action on the world
         changes = actions.perform[action_key](world, params)
+        changes['is_dead'] = False
         
         # loop through changes and apply
         for change in changes.keys():
@@ -272,7 +273,7 @@ class action(webapp.RequestHandler):
 
         # add tile changes caused by monsters
         changes['world'].extend(m_change['world'])
-        changes['is_dead'] = m_change['is_dead']
+        changes['is_dead'] = changes['is_dead'] or m_change['is_dead']
         player = m_change['player']
         
         # board updates!
