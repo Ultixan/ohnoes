@@ -28,6 +28,8 @@ var TIMEOUT = 5000;
 var timer = setTimeout(performNoAction, TIMEOUT);
 
 var getTileElement = function(x, y) {
+    x = x < 0 ? x + 10 : x;
+    y = y < 0 ? y + 10 : y;
     var row = $('table.grid tr:nth-child(' + (y + 2) + ')');
     var elem = $('td:nth-child(' + (x + 2) + ')', row);
     return elem;

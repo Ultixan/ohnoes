@@ -89,6 +89,14 @@ def clean_up_game(game):
     game.put()
     logging.info('Saved!')
 
+class home(webapp.RequestHandler):
+    path = template_path('index.html')
+
+    def get(self):
+        self.response.out.write(
+            template.render(self.path, {})
+        )
+
 class display_game(webapp.RequestHandler):
     path = template_path('game.html')
 
@@ -172,13 +180,6 @@ class action(webapp.RequestHandler):
         powerups = new_powerups
         
         
-        # FIRST update allowed actions (i.e. a turn has passed for them)
-        for i in range(len(player['abilities'])):
-            if player['abilities'][i] > 0:
-                player['abilities'][i] -= 1
-        
-        # THEN perform new action && make it invalid
-
         # get action params from POST
         params = json.loads(self.request.body)
 
@@ -323,7 +324,8 @@ class action(webapp.RequestHandler):
         self.response.out.write(json.dumps(changes))
 
 urls = [
-    ('/', display_game),
+    ('/', home),
+    ('/game', display_game),
     ('/action', action),
     ('/results', results)
   ]
