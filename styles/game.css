@@ -254,3 +254,13 @@ div.blocker {
   width: 90px;
   margin-left: 30%;
 }
+
+span.blanket {
+  background-image: url('/images/blankie.png');
+  background-repeat: no-repeat;
+}
+
+span.candy {
+  background-image: url('/images/lollipop.png');
+  background-repeat: no-repeat;
+}

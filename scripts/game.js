@@ -26,6 +26,7 @@ var performNoAction = function() {
 };
 var TIMEOUT = 5000;
 var timer = setTimeout(performNoAction, TIMEOUT);
+var candy = [];
 
 var getTileElement = function(x, y) {
     x = x < 0 ? x + 10 : x;
@@ -125,6 +126,18 @@ var updateMonsters = function(monsters) {
     initialised = true;
 };
 
+var handlePowerups = function(powerups) {
+    $.each(candy, function(index, sweet) {
+        sweet.remove();
+    });
+    candy = [];
+    $.each(powerups, function(index, pwr) {
+        var sweet = $('<span class="monster ' + pwr.type + '"/>');
+        getTileElement(pwr.x, pwr.y).append(sweet);
+        candy.push(sweet);
+    });
+};
+
 var handleUpdate = function(rsp) {
     clearTimeout(timer);
     if (rsp.hasOwnProperty('world')) {
@@ -135,6 +148,9 @@ var handleUpdate = function(rsp) {
     }
     if (rsp.hasOwnProperty('monsters')) {
         updateMonsters(rsp.monsters);
+    }
+    if (rsp.hasOwnProperty('powerups')) {
+        handlePowerups(rsp.powerups);
     }
     if (rsp.hasOwnProperty('is_dead') && rsp.is_dead) {
         $('#overlay').show();
