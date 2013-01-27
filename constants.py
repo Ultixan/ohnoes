@@ -37,7 +37,7 @@ powerup_list = {
 	'normal':['blanket','candy']
 }
 
-start_drop_rate = 0.1
+start_drop_rate = 0.02
 
 column_range = range(0, 12)
 

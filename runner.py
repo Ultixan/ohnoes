@@ -41,6 +41,7 @@ class results(webapp.RequestHandler):
 
         player = json.loads(game.player)
         turns_lasted = game.turn_count
+        candy_eaten = game.candy_eaten
         last_heartrate = player['heartrate']
         last_heartbeats = player['heartbeats']
         monsters = json.loads(game.monsters)
@@ -64,6 +65,7 @@ class results(webapp.RequestHandler):
                     'killer': killer,
                     'turns': turns_lasted,
                     'stupid': stupid
+                    'candy': candy_eaten
                 })
             )
         
@@ -240,6 +242,7 @@ class action(webapp.RequestHandler):
                 
                 # candy
                 elif pu['type'] == 'candy':
+                    game.candy_eaten += 1
                     # move player again
                     player_changes = zoo.move_player(world, player, m_grid)
                     player = player_changes['player']

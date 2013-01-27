@@ -10,6 +10,7 @@ class Game(db.Model):
     player = db.StringProperty(indexed=False)
     turn_count = db.IntegerProperty(indexed=False)
     is_dead = db.IntegerProperty(indexed=False)
+    candy_eaten = db.IntegerProperty(indexed=False)
 
 class Account(db.Model):
     user = db.UserProperty()
