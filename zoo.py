@@ -41,6 +41,14 @@ def move_monsters(world, monsters, player, m_grid, active_monsters):
             # save new position
             m['x'] = nx
             m['y'] = ny
+        else:
+            mcode = (mcode + [-1,1][randint(0,1)]) % 4
+            world[my][mx] = mcode
+            changes['world'].append({
+                'x': mx,
+                'y': my,
+                'direction': directions[mcode]
+            })
        
         mx = m['x']
         my = m['y']
