@@ -71,7 +71,6 @@ def get_game(game_id):
         game.turn_count = 0
         game.is_dead = 0
         game.drop_chance = start_drop_rate
-        game.candy_eaten = 0
         game.put()
     else:
         game = game[0]
@@ -120,7 +119,7 @@ def drop_powerup(drop_chance, powerups, m_grid, player, p_grid):
         drop_chance = start_drop_rate
     else:
         # increase drop chance
-        drop_chance = drop_chance + 0.02
+        drop_chance = drop_chance + 0.05
 
     return {'powerups':powerups, 'drop_chance':drop_chance}
     
