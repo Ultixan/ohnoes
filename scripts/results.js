@@ -34,4 +34,7 @@ $(document).ready(function() {
         total += score.score;
     });
     $('#total .score').text(total);
+    $('#play_again').click(function(ev) {
+        window.location = '/game';
+    });
 });

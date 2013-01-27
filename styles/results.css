@@ -41,3 +41,9 @@ body {
   position: static;
   vertical-align: middle;
 }
+
+#play_again {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+}
