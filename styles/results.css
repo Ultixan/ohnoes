@@ -1,0 +1,33 @@
+#titles * {
+  display: none;
+}
+
+#scores {
+  display: inline-block;
+  vertical-align: top;
+}
+
+#image {
+  width: 728px;
+  height: 728px;
+  background-repeat: no-repeat;
+  background-position: top left;
+  display: inline-block;
+  vertical-align: top;
+}
+
+#image.survivor {
+  background-image: url('/images/babyhappy.png');
+}
+
+#image.explode {
+  background-image: url('/images/grenadeheart.png');
+}
+
+#image.killed {
+  background-image: url('/images/grimreaper.png');
+}
+
+#image.headon {
+  background-image: url('/images/creepymonster.png');
+}

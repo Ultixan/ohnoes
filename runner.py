@@ -41,8 +41,16 @@ class results(webapp.RequestHandler):
         turns_lasted = game.turn_count
         last_heartrate = player['heartrate']
         last_heartbeats = player['heartbeats']
-        monsters = game.monsters
-        active_monsters = game.active_monsters
+        monsters = json.loads(game.monsters)
+        active_monsters = json.loads(game.active_monsters)
+        px = player['x']
+        py = player['y']
+        killer = None
+        for a in active_monsters:
+            m = monsters[a]
+            if m['x'] == px and m['y'] == py:
+                killer = a
+                break
 
         clean_up_game(game)
 
@@ -50,8 +58,7 @@ class results(webapp.RequestHandler):
                 template.render(self.path, {
                     'heartrate': last_heartrate,
                     'heartbeat': last_heartbeats,
-                    'monsters': json.loads(monsters),
-                    'active_monsters': json.loads(active_monsters),
+                    'killer': killer,
                     'turns': turns_lasted
                 })
             )
@@ -74,6 +81,7 @@ def clean_up_game(game):
     game.powerups = json.dumps(powerups)
     game.player = json.dumps(player)
     game.is_dead = 0
+    game.turn_count = 0
     
     # save stuff
     game.put()

@@ -2,15 +2,54 @@
   <head>
     <title>Oh Noes!</title>
     <link rel="stylesheet" href="styles/common.css"/>
+    <link rel="stylesheet" href="styles/results.css"/>
     <script src="scripts/jq.js" type="text/javascript"></script>
   </head>
   <body>
     <script type="text/javascript">
-      console.log({{heartrate}});
-      console.log({{heartbeat}});
-      console.log({{monsters}});
-      console.log({{active_monsters}});
-      console.log({{turns}});
+      var monster = '{{killer}}';
+      var heartrate = {{heartrate}};
+      var heartbeat = {{heartbeat}};
+      var turns = {{turns}};
     </script>
+    <h1>Results</h1>
+    <div id="titles">
+      <h2 class="explode">Oooh, that looks messy...</h2>
+      <h3 class="explode">You were so terrified that you heart litterally exploded out of your chest</h3>
+      <h2 class="killed">Who says nightmares aren't real...</h2>
+      <h3 class="killed">You were so scared by nightmares of <span id="monster_hook"></span>, that you died of fear</h3>
+      <h2 class="survivor">Well done!</h2>
+      <h3 class="survivor">You managed to survive the night and avoid all the nightmares</h3>
+      <h2 class="headon">You faced your irrational fears headon...</h2>
+      <h3 class="headon">Too bad they weren't so irrational</h3>
+    </div>
+    <div id="scores">
+      <table>
+        <tr id="rate">
+          <td>Final Heart Rate:</td>
+          <td class="value"></td>
+          <td class="score"></td>
+        </tr>
+        <tr id="beats">
+          <td>Remaining Heart Beats:</td>
+          <td class="value"></td>
+          <td class="score"></td>
+        </tr>
+        <tr id="turns">
+          <td>Turns Survived:</td>
+          <td class="value"></td>
+          <td class="score"></td>
+        </tr>
+        <tr id="total">
+          <td></td>
+          <td>Total:</td>
+          <td class="score"></td>
+        <tr>
+      </table>
+    </div>
+    <div id="image">
+    
+    </div>
+    <script src="/scripts/results.js" type="text/javascript"></script>
   </body>
 </html>
