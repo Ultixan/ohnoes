@@ -1,6 +1,7 @@
 var state = 'waiting';
 var action = null;
 var direction = null;
+var initialised = false;
 var shifters = $('table.grid td.shifter');
 var target = $('<div id="target"/>');
 var tiles = $('table.grid td.tile');
@@ -107,9 +108,12 @@ var updateMonsters = function(monsters) {
     $.each(monsters, function(monster, position) {
         if (!pokedex.hasOwnProperty(monster)) {
             pokedex[monster] = $('<span class="monster ' + monster + '"/>');
+            if(initialised)
+                playSound(monster);
         }
         getTileElement(position.x, position.y).append(pokedex[monster]);
     });
+    initialised = true;
 };
 
 var handleUpdate = function(rsp) {
@@ -152,17 +156,28 @@ var replay_audio = function() {
         document.getElementById(id).play();
 };
 var choose_glitch = function(arr) {
-    if(choice([1,2,3])==1){
+    if(choice([1,2,3])==1) {
         var id='glitch'+choice(['1','2','3']);
         document.getElementById(id).load();
         document.getElementById(id).play();
     }
-    else
-    {
+    else {
         var id='soundtrack'+choice(arr);
         document.getElementById(id).load();
         document.getElementById(id).play();
     }
+};
+var foley = function(id) {
+  document.getElementById(id).load();
+  document.getElementById(id).play();
+};
+var playSound = function(monster) {
+        if(monster === 'stove' || monster === 'lighter' || monster === 'flame')
+            foley("fire");
+        else if(monster === 'jelly' || monster === 'shark' || monster === 'octo')
+            foley('water');
+        else if(monster === 'spider' || monster === 'rat' || monster === 'snake')
+            foley('crawlies');
 };
 var beat2 = function() {
     playBeat();
