@@ -2,6 +2,8 @@ var state = 'waiting';
 var action = null;
 var direction = null;
 var initialised = false;
+var musicplay = true;
+var soundplay = true;
 var shifters = $('table.grid td.shifter');
 var target = $('<div id="target"/>');
 var tiles = $('table.grid td.tile');
@@ -149,8 +151,10 @@ var performAction = function(params) {
 
 var audio = $('audio');
 var playBeat = function() {
-    audio[0].load();
-    audio[0].play();
+    if(soundplay) {
+        audio[0].load();
+        audio[0].play();
+    }
 };
 function choice(arr){
     var c = arr.length;
@@ -158,26 +162,52 @@ function choice(arr){
     var i = Math.floor(c*f);
     return arr[i];
 };
+var togglemusic = function() {
+    if(musicplay) {
+        musicplay = false;
+        console.log('musicplay=false');
+        document.getElementById('soundtrack1').pause();
+        document.getElementById('soundtrack2').pause();
+        document.getElementById('soundtrack3').pause();
+        document.getElementById('glitch1').pause();
+        document.getElementById('glitch2').pause();
+        document.getElementById('glitch3').pause();
+    }
+    else {
+        musicplay = true;
+        replay_audio();
+    }
+};
+var togglesound = function() {
+    soundplay = !soundplay;
+};
+
 var replay_audio = function() {
+    if(musicplay) {
         var id='soundtrack'+choice(['2','3']);
         document.getElementById(id).load();
         document.getElementById(id).play();
+    }
 };
 var choose_glitch = function(arr) {
-    if(choice([1,2,3])==1) {
-        var id='glitch'+choice(['1','2','3']);
-        document.getElementById(id).load();
-        document.getElementById(id).play();
-    }
-    else {
-        var id='soundtrack'+choice(arr);
-        document.getElementById(id).load();
-        document.getElementById(id).play();
+    if(musicplay) {
+        if(choice([1,2,3])==1) {
+            var id='glitch'+choice(['1','2','3']);
+            document.getElementById(id).load();
+            document.getElementById(id).play();
+        }
+        else {
+            var id='soundtrack'+choice(arr);
+            document.getElementById(id).load();
+            document.getElementById(id).play();
+        }
     }
 };
 var foley = function(id) {
-  document.getElementById(id).load();
-  document.getElementById(id).play();
+  if(soundplay) {
+    document.getElementById(id).load();
+    document.getElementById(id).play();
+  }
 };
 var playSound = function(monster) {
         if(monster === 'stove' || monster === 'lighter' || monster === 'flame')
