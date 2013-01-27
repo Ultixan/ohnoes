@@ -179,6 +179,9 @@ span.monster {
   height: 50px;
   width: 50px;
   display: inline-block;
+  position: absolute;
+  top: 10%;
+  left: 10%;
 }
 
 span.flame {
