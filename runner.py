@@ -58,7 +58,7 @@ class results(webapp.RequestHandler):
         self.response.out.write(
                 template.render(self.path, {
                     'heartrate': last_heartrate,
-                    'heartbeat': last_heartbeats is last_heartbeats > 0 else 0,
+                    'heartbeat': last_heartbeats if last_heartbeats > 0 else 0,
                     'killer': killer,
                     'turns': turns_lasted
                 })
