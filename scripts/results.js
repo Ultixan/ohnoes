@@ -14,7 +14,9 @@ $(document).ready(function() {
             score: (heartrate - 50) * -3
         }
     };
-    if (monster) {
+    if (stupid) {
+        target = 'headon';
+    } else if (monster) {
         $('#monster_hook').addClass(monster);
         target = 'killed';
     } else if (heartrate < 200 && heartbeat <= 0) {

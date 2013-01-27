@@ -45,6 +45,7 @@ class results(webapp.RequestHandler):
         last_heartbeats = player['heartbeats']
         monsters = json.loads(game.monsters)
         active_monsters = json.loads(game.active_monsters)
+        stupid = 'true' if player['stupid'] else 'false'
         px = player['x']
         py = player['y']
         killer = None
@@ -61,7 +62,8 @@ class results(webapp.RequestHandler):
                     'heartrate': last_heartrate,
                     'heartbeat': last_heartbeats if last_heartbeats > 0 else 0,
                     'killer': killer,
-                    'turns': turns_lasted
+                    'turns': turns_lasted,
+                    'stupid': stupid
                 })
             )
         
@@ -74,6 +76,7 @@ def clean_up_game(game):
     
     player['heartrate'] = 50    # reset heartrate
     player['heartbeats'] = max_beats # reset heartbeats
+    player['stupid'] = False
     active_monsters = []        # reset active monsters
     powerups = []               # clear all powerups
     for a in player['abilities']:           # reset timedown on abilities
@@ -231,7 +234,7 @@ class action(webapp.RequestHandler):
                     # loop through active monsts and remove close ones
                     safe_monsters = []
                     for m in active_monsters:
-                        if abs(monsters[m]['x'] - pu['x']) > 2 and abs(monsters[m]['y'] - pu['y']) > 2:
+                        if abs(monsters[m]['x'] - pu['x']) > 2 or abs(monsters[m]['y'] - pu['y']) > 2:
                             safe_monsters.append[m]
                     active_monsters = safe_monsters
                 

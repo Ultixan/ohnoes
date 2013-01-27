@@ -1,3 +1,7 @@
+body {
+  overfloy-y: hidden;
+}
+
 #titles * {
   display: none;
 }
