@@ -49,7 +49,8 @@ def get_game(game_id):
             'heartbeats': max_beats,
             'x': 5,
             'y': 5,
-            'abilities':[ 0, 0, 0, 0 ]
+            'abilities':[ 0, 0, 0, 0 ],
+            'stupid':False
         }
         monsters = {}
         for monster in elements.keys():

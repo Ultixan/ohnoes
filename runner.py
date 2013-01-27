@@ -181,6 +181,7 @@ class action(webapp.RequestHandler):
         if player_changes['died']:
 			game.is_dead = 1
 			changes['is_dead'] = True
+			player['stupid'] = True
         
         # powerups infrastructure
         new_powerups = []
