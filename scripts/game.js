@@ -147,8 +147,9 @@ function choice(arr){
     return arr[i];
 };
 var replay_audio = function() {
-    document.getElementById('soundtrack').load();
-    document.getElementById('soundtrack').play();
+        var id='soundtrack'+choice(['2','3']);
+        document.getElementById(id).load();
+        document.getElementById(id).play();
 };
 var choose_glitch = function() {
     if(choice([1,2,3])==1){
