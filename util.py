@@ -70,3 +70,22 @@ def get_game(game_id):
     else:
         game = game[0]
     return game
+
+def calc_move(move_code, coords):  
+    if move_code == 0:
+        coords['y'] = (coords['y']-1)%10
+    elif move_code == 1:
+        coords['x'] = (coords['x']+1)%10
+    elif move_code == 2:
+        coords['y'] = (coords['y']+1)%10
+    elif move_code == 3:
+        coords['x'] = (coords['x']-1)%10
+
+    return coords;
+    
+def gen_rand_coords():
+    # gen random coords
+    x = randint(0, 9)
+    y = randint(0, 9)
+    return {'x': x, 'y': y}
+
