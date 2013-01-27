@@ -122,6 +122,9 @@ var handleUpdate = function(rsp) {
     if (rsp.hasOwnProperty('monsters')) {
         updateMonsters(rsp.monsters);
     }
+    if (rsp.hasOwnProperty('is_dead') && rsp.is_dead) {
+        $('#overlay').show();
+    }
 };
 
 var performAction = function(params) {
@@ -308,6 +311,12 @@ $(document).ready(function() {
     });
     $('div.blocker').click(function(ev) {
         ev.stopPropagation();
+    });
+    $('#overlay').click(function(ev) {
+        ev.stopPropagation();
+    });
+    $('#gameover input').click(function(ev) {
+        window.location = '/results';
     });
     updatePlayer(player);
     updateMonsters(starting_monsters);

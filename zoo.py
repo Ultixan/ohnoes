@@ -48,6 +48,7 @@ def move_monsters(world, monsters, player, m_grid, active_monsters):
         if abs(mx - px) <= 2 and abs(my - py) <= 2:
             if mx == px and my == py:
                 # on the same square
+                heartrate += 1
                 changes['is_dead'] = True
             elif abs(mx - px) <= 1 and abs(my - py) <= 1:
                 # superclose
