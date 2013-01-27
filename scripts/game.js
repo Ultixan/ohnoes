@@ -158,8 +158,9 @@ var choose_glitch = function() {
     }
     else
     {
-        document.getElementById('soundtrack').load();
-        document.getElementById('soundtrack').play();
+        var id='soundtrack'+choice(['1','2','3']);
+        document.getElementById(id).load();
+        document.getElementById(id).play();
     }
 };
 var beat2 = function() {

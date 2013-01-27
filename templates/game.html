@@ -30,8 +30,14 @@
   </head>
   <body>
     <audio src="/sounds/heartbeat.ogg" type="audio/ogg" loop></audio>
-    <audio id="soundtrack" onended="choose_glitch()" preload="auto" autoplay="true">
+    <audio id="soundtrack1" onended="choose_glitch()" preload="auto" autoplay="true">
       <source src="/sounds/original.ogg" type="audio/ogg"/>
+    </audio>
+    <audio id="soundtrack2" onended="choose_glitch()" preload="auto">
+      <source src="/sounds/original2.ogg" type="audio/ogg"/>
+    </audio>
+    <audio id="soundtrack3" onended="choose_glitch()" preload="auto">
+      <source src="/sounds/original3.ogg" type="audio/ogg"/>
     </audio>
     <audio id="glitch1" onended="replay_audio()"preload="auto">
       <source src="/sounds/dip.ogg" type="audio/ogg"/>
