@@ -180,6 +180,18 @@ function choice(arr){
     var i = Math.floor(c*f);
     return arr[i];
 };
+
+var musicvolume = function() {
+        $('#soundtrack1')[0].volume=0.1;
+        $('#soundtrack2')[0].volume=0.1;
+        $('#soundtrack3')[0].volume=0.1;
+        $('#glitch1')[0].volume=0.1;
+        $('#glitch2')[0].volume=0.1;
+        $('#glitch3')[0].volume=0.1;
+        $('#fire')[0].volume=0.1;
+        $('#water')[0].volume=0.1;
+        $('#crawlies')[0].volume=0.1;
+};
 var togglemusic = function() {
     if(musicplay) {
         musicplay = false;
@@ -265,6 +277,7 @@ var manageBeat = function() {
 };
 
 $(document).ready(function() {
+    musicvolume();
     $('td.tile', 'table.grid').mouseover(function(ev) {
         if (state === 'targeting') {
             $(ev.currentTarget).append(target);
