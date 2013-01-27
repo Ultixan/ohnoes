@@ -21,39 +21,42 @@ from random import randint
 
 def authorize(scope):
     user = users.get_current_user() 
+    if not user:
+        scope.redirect(users.create_login_url(scope.request.uri))
+        return None
     return user
 
-def end_game_redirect(self,game):
-    world = json.loads(game.tiles)
-    #monsters = json.loads(game.monsters)
-    #active_monsters = json.loads(game.active_monsters)
-    #powerups = json.loads(game.powerups)
-    player = json.loads(game.player)
-    
-    # LALALA DEATH SCREEEEN
-    # fetch needed endscreen data
-    turns_lasted = game.turn_count
-    last_heartrate = player['heartrate']
-    last_heartbeats = player['heartbeats']
-    monsters = game.monsters
-    active_monsters = game.active_monsters
-    
-    # clean up game
-    clean_up_game(game)
-    
+class results(webapp.RequestHandler):
     path = template_path('results.html')
 
-    # send end of game data to redirect
-    self.response.out.write(
-            template.render(self.path, {
-                'heartrate': last_heartrate,
-                'heartbeat': last_heartbeats,
-                'monsters': json.loads(monsters),
-                'active_monsters': json.loads(active_monsters),
-                'turns': turns_lasted
-            })
-        )
-    
+    def get(self):
+        user = authorize(self)
+        account = get_account(user)
+        game = get_game(account.game_id)
+
+        if game.is_dead != 1:
+            self.redirect('/')
+
+        player = json.loads(game.player)
+        turns_lasted = game.turn_count
+        last_heartrate = player['heartrate']
+        last_heartbeats = player['heartbeats']
+        monsters = game.monsters
+        active_monsters = game.active_monsters
+
+        clean_up_game(game)
+
+        self.response.out.write(
+                template.render(self.path, {
+                    'heartrate': last_heartrate,
+                    'heartbeat': last_heartbeats,
+                    'monsters': json.loads(monsters),
+                    'active_monsters': json.loads(active_monsters),
+                    'turns': turns_lasted
+                })
+            )
+        
+
 def clean_up_game(game):
     # get stuff
     active_monsters = json.loads(game.active_monsters)
@@ -61,7 +64,7 @@ def clean_up_game(game):
     player = json.loads(game.player)
     
     player['heartrate'] = 50    # reset heartrate
-    player['heartbeats'] = 1000 # reset heartbeats
+    player['heartbeats'] = max_beats # reset heartbeats
     active_monsters = []        # reset active monsters
     powerups = []               # clear all powerups
     for a in player['abilities']:           # reset timedown on abilities
@@ -70,24 +73,23 @@ def clean_up_game(game):
     game.active_monsters = json.dumps(active_monsters)
     game.powerups = json.dumps(powerups)
     game.player = json.dumps(player)
+    game.is_dead = 0
     
     # save stuff
     game.put()
+    logging.info('Saved!')
 
 class display_game(webapp.RequestHandler):
     path = template_path('game.html')
 
     def get(self):
         user = authorize(self)
-        if not user:
-            self.redirect(users.create_login_url(self.request.uri))
-            return
         account = get_account(user)
         game = get_game(account.game_id)
         
         # check for death condition
         if game.is_dead == 1:
-            end_game_redirect(self, game)
+            self.redirect('/results')
         
         tiles = []
         for row in json.loads(game.tiles):
@@ -216,7 +218,7 @@ class action(webapp.RequestHandler):
         
         # check death conditions
         # no more heartbeats
-        if player['heartbeats'] < 1 or player['heartrate'] > 199: 
+        if player['heartbeats'] < 1 or player['heartrate'] > 199 or changes['is_dead']: 
             game.is_dead = 1
             changes['is_dead'] = True
         
@@ -246,7 +248,8 @@ class action(webapp.RequestHandler):
 
 urls = [
     ('/', display_game),
-    ('/action', action)
+    ('/action', action),
+    ('/results', results)
   ]
 
 app = webapp.WSGIApplication(urls, debug=True)
