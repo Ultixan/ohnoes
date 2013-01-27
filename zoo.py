@@ -3,7 +3,7 @@ from util import calc_move
 from util import gen_rand_coords
 from random import randint
 
-def move_monsters(world, monsters, player, m_grid, active_monsters):
+def move_monsters(world, monsters, player, m_grid, active_monsters, p_grid, powerups):
     changes = {
         'world': [],
         'monsters': [],
@@ -41,6 +41,13 @@ def move_monsters(world, monsters, player, m_grid, active_monsters):
             # save new position
             m['x'] = nx
             m['y'] = ny
+            # remove any powerups stepped on
+            p_grid[ny][nx] = None
+            new_powerups = []
+            for pu in powerups:
+                if not (pu['x'] == nx and pu['y'] == ny):
+                    new_powerups.append(pu)
+            powerups = new_powerups
         else:
             mcode = (mcode + [-1,1][randint(0,1)]) % 4
             world[my][mx] = mcode
@@ -75,10 +82,12 @@ def move_monsters(world, monsters, player, m_grid, active_monsters):
         'm_grid': m_grid,
         'changes': changes,
         'world': world,
-        'monsters': monsters
+        'monsters': monsters,
+        'p_grid': p_grid,
+        'powerups': powerups
     }
 
-def spawn_monster(monsters, active_monsters, player, m_grid):
+def spawn_monster(monsters, active_monsters, player, m_grid, powerups, p_grid):
     # get free monsters
     free_monsters = []
     for key in monsters.keys():
@@ -99,13 +108,24 @@ def spawn_monster(monsters, active_monsters, player, m_grid):
                 monsters[new_monst]['x'] = x
                 monsters[new_monst]['y'] = y
                 active_monsters.append(new_monst)
+                
+                # remove any powerups stepped on
+                p_grid[y][x] = None
+                new_powerups = []
+                for pu in powerups:
+                    if not (pu['x'] == x and pu['y'] == y):
+                        new_powerups.append(pu)
+                powerups = new_powerups
+                
                 break
             # else loop again
         
     # when monster has spawned, return updated lists
     return {
         'monsters': monsters,
-        'active_monsters': active_monsters
+        'active_monsters': active_monsters,
+        'p_grid': p_grid,
+        'powerups': powerups
     }
 
 def move_player(world, player, m_grid):

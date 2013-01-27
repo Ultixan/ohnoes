@@ -4,10 +4,13 @@ import os
 from constants import template_dir
 from constants import max_beats
 from constants import elements
+from constants import powerup_list
+from constants import start_drop_rate
 from google.appengine.ext import db
 from models import Account
 from models import Game
 from random import randint
+from random import choice
 
 def template_path(template):
     path = os.path.join(
@@ -67,6 +70,7 @@ def get_game(game_id):
         game.game_id = game_id
         game.turn_count = 0
         game.is_dead = 0
+        game.drop_chance = start_drop_rate
         game.put()
     else:
         game = game[0]
@@ -90,3 +94,32 @@ def gen_rand_coords():
     y = randint(0, 9)
     return {'x': x, 'y': y}
 
+def drop_powerup(drop_chance, powerups, m_grid, player, p_grid):
+    # will drop happen?
+    if randint(0,99)/100 < drop_chance:
+        # choose group (just 'normal' for now, but extendable to 'rare' etc)
+        choose_from = powerup_list['normal']
+        
+        # choose thing in group
+        pu = choice(choose_from)
+        
+        # choose where
+        while (True):
+            coords = gen_rand_coords()
+            x = coords['x']
+            y = coords['y']
+            # check if space is free
+            if (y not in m_grid or x not in m_grid[y]) and (y not in p_grid or x not in p_grid[y]) and not (player['x'] == x and player['y'] == y):
+                # if so, drop there, add thing to powerups and break
+                powerups.append({'type':pu, 't':5, 'x':x, 'y':y}) 
+                break
+            # else loop again
+            
+        # reset drop chance
+        drop_chance = start_drop_rate
+    else:
+        # increase drop chance
+        drop_chance = drop_chance + 0.05
+
+    return {'powerups':powerups, 'drop_chance':drop_chance}
+    

@@ -6,6 +6,7 @@ class Game(db.Model):
     monsters = db.StringProperty(indexed=False)
     active_monsters = db.StringProperty(indexed=False)
     powerups = db.StringProperty(indexed=False)
+    drop_chance = db.FloatProperty(indexed=False)
     player = db.StringProperty(indexed=False)
     turn_count = db.IntegerProperty(indexed=False)
     is_dead = db.IntegerProperty(indexed=False)

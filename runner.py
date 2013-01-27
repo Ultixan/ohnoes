@@ -16,6 +16,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from util import template_path
 from util import get_game
 from util import get_account
+from util import drop_powerup
 from random import choice
 from random import randint
 
@@ -154,7 +155,30 @@ class action(webapp.RequestHandler):
         for a in active_monsters:
             m = monsters[a]
             m_grid[m['y']][m['x']] = m  
-    
+        
+        # establish powerup positions and update countdown on powerups        
+        p_grid = []
+        for i in range(10):
+            row = []
+            for j in range(10):
+                row.append(None)
+            p_grid.append(row)
+        new_powerups = []
+        for a in powerups:
+            a['t'] -= 1
+            if a['t']>=0:   # if the powerup is still active, add to grid
+                new_powerups.append(a)
+                p_grid[a['y']][a['x']] = a['type']
+        powerups = new_powerups
+        
+        
+        # FIRST update allowed actions (i.e. a turn has passed for them)
+        for i in range(len(player['abilities'])):
+            if player['abilities'][i] > 0:
+                player['abilities'][i] -= 1
+        
+        # THEN perform new action && make it invalid
+
         # get action params from POST
         params = json.loads(self.request.body)
 
@@ -191,17 +215,36 @@ class action(webapp.RequestHandler):
         player_changes = zoo.move_player(world, player, m_grid)
         player = player_changes['player']
         if player_changes['died']:
-			game.is_dead = 1
-			changes['is_dead'] = True
-			player['stupid'] = True
+            game.is_dead = 1
+            changes['is_dead'] = True
+            player['stupid'] = True
         
-        # powerups infrastructure
+        # powerups effect
         new_powerups = []
-        for p in powerups:
-            if (p['x'] == player['x'] and p['y'] == player['y']): # if there is a powerup on the square
-                player['abilities'][p['name']] = 0  # pick it up
+        for pu in powerups:
+            if (pu['x'] == player['x'] and pu['y'] == player['y']): # if there is a powerup on the square
+                p_grid[pu['y']][pu['x']] = None # pick it up
+                
+                # blanket
+                if pu['type'] == 'blanket':
+                    # loop through active monsts and remove close ones
+                    safe_monsters = []
+                    for m in active_monsters:
+                        if abs(monsters[m]['x'] - pu['x']) > 2 and abs(monsters[m]['y'] - pu['y']) > 2:
+                            safe_monsters.append[m]
+                    active_monsters = safe_monsters
+                
+                # candy
+                elif pu['type'] == 'candy':
+                    # move player again
+                    player_changes = zoo.move_player(world, player, m_grid)
+                    player = player_changes['player']
+                    if player_changes['died']:
+                        game.is_dead = 1
+                        changes['is_dead'] = True
+                        player['stupid'] = True
             else:
-                new_powerups.append(p)
+                new_powerups.append(pu)
         powerups = new_powerups
                 
         # move monsters
@@ -210,11 +253,15 @@ class action(webapp.RequestHandler):
             monsters, 
             player, 
             m_grid, 
-            active_monsters)
+            active_monsters,
+            p_grid,
+            powerups)
         monsters = monster_changes['monsters']
         m_grid = monster_changes['m_grid']
         world = monster_changes['world']
         m_change = monster_changes['changes']
+        p_grid = monster_changes['p_grid']
+        powerups = monster_changes['powerups']
 
         # add tile changes caused by monsters
         changes['world'].extend(m_change['world'])
@@ -224,17 +271,25 @@ class action(webapp.RequestHandler):
         # board updates!
         # tile randomising (non-vital)
         # monster spawning
+        
         if game.turn_count % monster_spawn_rate == 0:
             spawn_results = zoo.spawn_monster(
                 monsters, 
                 active_monsters, 
                 player,
-                m_grid)
+                m_grid,
+                powerups,
+                p_grid)
             monsters = spawn_results['monsters']
             active_monsters = spawn_results['active_monsters']
+            p_grid = monster_changes['p_grid']
+            powerups = monster_changes['powerups']
         
-        # powerup drops
-        
+        # powerup drop
+        powerup_changes = drop_powerup(game.drop_chance, powerups, m_grid, player, p_grid)
+        powerups = powerup_changes['powerups']
+        game.drop_chance = powerup_changes['drop_chance']
+        # not updating p_grid because not used again
         
         # check death conditions
         # no more heartbeats
@@ -248,7 +303,7 @@ class action(webapp.RequestHandler):
         game.monsters = json.dumps(monsters)
         game.active_monsters = json.dumps(active_monsters)
         # save the new powerup positions
-        #game.powerups = json.dumps(powerups)
+        game.powerups = json.dumps(powerups)
         # save the updated health
         game.player = json.dumps(player)
         
@@ -261,6 +316,7 @@ class action(webapp.RequestHandler):
             monster_details[monster] = monsters[monster]
         changes['monsters'] = monster_details
         changes['player'] = player
+        changes['powerups'] = powerups
         
         # response: send changes!
         self.response.headers['Content-Type'] = "application/json"
