@@ -55,7 +55,7 @@ var updatePlayer = function(pdata) {
     //Update position
     var tile = getTileElement(player.x, player.y);
     tile.append(player.element);
-    player.element.removeClass('happy nervoud worried scared terrified');
+    player.element.removeClass('happy nervous worried scared terrified');
     if (player.heartrate > 170) {
         player.element.addClass('terrified');
     } else if (player.heartrate > 140) {
@@ -165,57 +165,62 @@ function choice(arr){
 var togglemusic = function() {
     if(musicplay) {
         musicplay = false;
-        console.log('musicplay=false');
-        document.getElementById('soundtrack1').pause();
-        document.getElementById('soundtrack2').pause();
-        document.getElementById('soundtrack3').pause();
-        document.getElementById('glitch1').pause();
-        document.getElementById('glitch2').pause();
-        document.getElementById('glitch3').pause();
+        $('#soundtrack1')[0].pause();
+        $('#soundtrack2')[0].pause();
+        $('#soundtrack3')[0].pause();
+        $('#glitch1')[0].pause();
+        $('#glitch2')[0].pause();
+        $('#glitch3')[0].pause();
+        $('#music').removeClass('musicon');
+        $('#music').addClass('musicoff');
     }
     else {
         musicplay = true;
         replay_audio();
+        $('#music').removeClass('musicoff');
+        $('#music').addClass('musicon');
     }
 };
 var togglesound = function() {
     soundplay = !soundplay;
+    $('#sound').removeClass('soundon soundoff');
+    $('#sound').addClass(soundplay?'soundon':'soundoff');
 };
 
 var replay_audio = function() {
     if(musicplay) {
-        var id='soundtrack'+choice(['2','3']);
-        document.getElementById(id).load();
-        document.getElementById(id).play();
+        var id='#soundtrack'+choice(['2','3']);
+        $(id)[0].load();
+        $(id)[0].play();
     }
 };
 var choose_glitch = function(arr) {
     if(musicplay) {
         if(choice([1,2,3])==1) {
-            var id='glitch'+choice(['1','2','3']);
-            document.getElementById(id).load();
-            document.getElementById(id).play();
+            var id='#glitch'+choice(['1','2','3']);
+            $(id)[0].load();
+            $(id)[0].play();
         }
         else {
-            var id='soundtrack'+choice(arr);
-            document.getElementById(id).load();
-            document.getElementById(id).play();
+            var id='#soundtrack'+choice(arr);
+            $(id)[0].load();
+            $(id)[0].play();
         }
     }
 };
 var foley = function(id) {
   if(soundplay) {
-    document.getElementById(id).load();
-    document.getElementById(id).play();
+    $(id)[0].load();
+    $(id)[0].play();
   }
 };
 var playSound = function(monster) {
         if(monster === 'stove' || monster === 'lighter' || monster === 'flame')
-            foley("fire");
+            foley("#fire");
         else if(monster === 'jelly' || monster === 'shark' || monster === 'octo')
-            foley('water');
+            foley('#water');
         else if(monster === 'spider' || monster === 'rat' || monster === 'snake')
-            foley('crawlies');
+            foley('#crawlies');
 };
 var beat2 = function() {
     playBeat();

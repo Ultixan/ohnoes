@@ -87,6 +87,37 @@ table.grid td.tile.current {
  background-image: url('/images/swap.png');
 }
 
+#music.musicon {
+  background-image: url('/images/musicon.png');
+}
+
+#controls {
+    position: absolute;
+    top: 400;
+    color: white;
+    padding: 0;
+}
+
+#controls li {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px 0;
+  cursor: pointer;
+  width: 64px;
+  height: 64px;
+}
+#music.musicoff {
+  background-image: url('/images/musicoff.png');
+}
+
+#sound.soundoff {
+  background-image: url('/images/speakeroff.png');
+}
+
+#sound.soundon {
+  background-image: url('/images/speakeron.png');
+}
+
 #heart_monitor {
   position: absolute;
   top: 20px;
