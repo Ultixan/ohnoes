@@ -7,7 +7,11 @@
   </head>
   <body>
     <script type="text/javascript">
+    {% if killer != None %}
       var monster = '{{killer}}';
+    {% else %}
+      var monster = null;
+    {% endif %}
       var heartrate = {{heartrate}};
       var heartbeat = {{heartbeat}};
       var turns = {{turns}};
