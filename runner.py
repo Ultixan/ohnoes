@@ -153,22 +153,25 @@ class action(webapp.RequestHandler):
         for a in active_monsters:
             m = monsters[a]
             m_grid[m['y']][m['x']] = m  
-        
-        # FIRST update allowed actions (i.e. a turn has passed for them)
-        for i in range(len(player['abilities'])):
-            if player['abilities'][i] > 0:
-                player['abilities'][i] -= 1
+    
+        # get action params from POST
+        params = json.loads(self.request.body)
+
+        # FIRST update allowed actions (i.e. a turn has passed for them) if they used an actual ability
+        # get action key
+        action_key = params['action']
+        action_code = ability_codes[action_key] if action_key in ability_codes else None
+        if action_code is not None:
+            for i in range(len(player['abilities'])):
+                if player['abilities'][i] > 0:
+                    player['abilities'][i] -= 1
+            player['abilities'][action_code] = 2
         # update countdown on powerups
         
         # THEN perform new action && make it invalid
-        # get action params from POST
-        params = json.loads(self.request.body)
-        # get action key
-        action_key = params['action']
         
         # calculate action on the world
         changes = actions.perform[action_key](world, params)
-        player['abilities'][ability_codes[action_key]] = 2
         
         # loop through changes and apply
         for change in changes.keys():

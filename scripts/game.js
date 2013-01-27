@@ -19,6 +19,11 @@ var abilities = [
     'swap_tiles',
     'shift_tiles'
 ];
+var performNoAction = function() {
+    performAction({action: 'timeout'});
+};
+var TIMEOUT = 5000;
+var timer = setTimeout(performNoAction, TIMEOUT);
 
 var getTileElement = function(x, y) {
     var row = $('table.grid tr:nth-child(' + (y + 2) + ')');
@@ -117,6 +122,7 @@ var updateMonsters = function(monsters) {
 };
 
 var handleUpdate = function(rsp) {
+    clearTimeout(timer);
     if (rsp.hasOwnProperty('world')) {
         updateTiles(rsp.world);
     }
@@ -128,6 +134,8 @@ var handleUpdate = function(rsp) {
     }
     if (rsp.hasOwnProperty('is_dead') && rsp.is_dead) {
         $('#overlay').show();
+    } else {
+        timer = setTimeout(performNoAction, TIMEOUT);
     }
 };
 

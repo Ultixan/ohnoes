@@ -70,9 +70,15 @@ def swap_tiles(world, params):
         }]
     }
 
+def null_action(world, params):
+    return {
+        'world': []
+    }
+
 perform = {
     'rotate_right': rotate_right,
     'rotate_left': rotate_left,
     'shift_tiles': shift_tiles,
-    'swap_tiles': swap_tiles
+    'swap_tiles': swap_tiles,
+    'timeout': null_action
 }
