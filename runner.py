@@ -235,7 +235,7 @@ class action(webapp.RequestHandler):
                     safe_monsters = []
                     for m in active_monsters:
                         if abs(monsters[m]['x'] - pu['x']) > 2 or abs(monsters[m]['y'] - pu['y']) > 2:
-                            safe_monsters.append[m]
+                            safe_monsters.append(m)
                     active_monsters = safe_monsters
                 
                 # candy
