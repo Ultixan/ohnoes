@@ -100,7 +100,7 @@ def spawn_monster(monsters, active_monsters, player, m_grid):
         'active_monsters': active_monsters
     }
 
-def move_player(world, player):
+def move_player(world, player, m_grid):
     px = player['x']
     py = player['y']
     # move player
@@ -108,4 +108,9 @@ def move_player(world, player):
     player['x'] = new_pos['x']
     player['y'] = new_pos['y']
     
-    return player   
+    died = False
+    # see if player lands on monster
+    if m_grid[player['y']] is not None and m_grid[player['y']][player['x']] is not None:
+        died = True
+    
+    return {'player':player, 'died':died}

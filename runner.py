@@ -135,6 +135,17 @@ class action(webapp.RequestHandler):
 
         player = json.loads(game.player)
         
+        # establish monster positions
+        m_grid = []
+        for i in range(10):
+            row = []
+            for j in range(10):
+                row.append(None)
+            m_grid.append(row)
+        for a in active_monsters:
+            m = monsters[a]
+            m_grid[m['y']][m['x']] = m  
+        
         # FIRST update allowed actions (i.e. a turn has passed for them)
         for i in range(len(player['abilities'])):
             if player['abilities'][i] > 0:
@@ -165,7 +176,13 @@ class action(webapp.RequestHandler):
                 continue #Futureproofing
         
         # move player & pick up any powerups
-        player = zoo.move_player(world, player)
+        player_changes = zoo.move_player(world, player, m_grid)
+        player = player_changes['player']
+        if player_changes['died']:
+			game.is_dead = 1
+			changes['is_dead'] = True
+        
+        # powerups infrastructure
         new_powerups = []
         for p in powerups:
             if (p['x'] == player['x'] and p['y'] == player['y']): # if there is a powerup on the square
@@ -174,16 +191,6 @@ class action(webapp.RequestHandler):
                 new_powerups.append(p)
         powerups = new_powerups
                 
-        # establish monster positions
-        m_grid = []
-        for i in range(10):
-            row = []
-            for j in range(10):
-                row.append(None)
-            m_grid.append(row)
-        for a in active_monsters:
-            m = monsters[a]
-            m_grid[m['y']][m['x']] = m  
         # move monsters
         monster_changes = zoo.move_monsters(
             world, 
